@@ -342,7 +342,7 @@ main { flex: 1; padding-block: 14px 18px; padding-left: max(16px, env(safe-area-
         </defs>
         <g id="g1"></g><g id="o1"></g>
       </svg>
-      <div class="stage-msg" id="msg1" aria-live="polite">Sodio: 11 protones y 11 electrones. Átomo neutro.</div>
+      <div class="stage-msg" id="msg1" aria-live="polite">Litio: 3 protones y 3 electrones. Átomo neutro.</div>
     </div>
     <div class="side">
       <section class="guide" id="guide-octeto" aria-label="Guía paso a paso"></section>
@@ -636,6 +636,8 @@ function makeGuide(key, steps, summary) {
     else if (a === 'skip') { st.done[st.i] = true; render(); }
     else if (a === 'restart') { st.done = steps.map(() => false); st.wrong = steps.map(() => new Set()); go(0); }
   });
+  // la simulación arranca en el estado que pide el primer paso
+  if (steps[0].enter) steps[0].enter();
   render();
   return { update, render };
 }
@@ -807,7 +809,7 @@ $('#reset0').addEventListener('click', () => set0(0));
 /* =====================================================================
    2. OCTETO
    ===================================================================== */
-const s1 = { sym: 'Na', e: 11, drag: null, names: true };
+const s1 = { sym: 'Li', e: 3, drag: null, names: true };
 const svg1 = $('#svg1');
 const R1 = [64, 104, 144, 184], C1 = { x: 330, y: 230 };
 
@@ -943,7 +945,7 @@ svg1.addEventListener('pointercancel', () => { if (s1.drag) { s1.drag.el.remove(
 $('#rem1').addEventListener('click', () => changeE1(-1));
 $('#add1').addEventListener('click', () => changeE1(+1));
 $('#names1').addEventListener('change', e => { s1.names = e.target.checked; render1(); });
-$('#reset1').addEventListener('click', () => select1('Na'));
+$('#reset1').addEventListener('click', () => select1('Li'));
 
 /* =====================================================================
    3. ENLACE IÓNICO
