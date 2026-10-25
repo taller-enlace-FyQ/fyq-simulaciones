@@ -1,0 +1,1797 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{box-sizing:border-box}[hidden]{display:none!important}</style></head><body>
+<title>Taller de enlaces</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Fredoka:wght@500;600&display=swap">
+<style>
+/* Laboratorio virtual: escenario blanco a la izquierda, guía y controles a la derecha
+   y barra de pantallas abajo. Una sola apariencia clara, como en un laboratorio. */
+:root {
+  --bg: #E9EEF5;
+  --stage: #FFFFFF;
+  --ink: #1C2333;
+  --muted: #586174;
+  --line: #CFD7E3;
+  --panel: #FFF7DE;
+  --panel-edge: #E6D49C;
+  --panel-head: #6E5200;
+  --electron: #2F6FE0;
+  --electron-dark: #1B4BB0;
+  --proton: #E2583E;
+  --metal: #AEBBCD;
+  --metal-edge: #6D7C92;
+  --nonmetal: #8ED6A6;
+  --nonmetal-edge: #4E9C6B;
+  --noble: #CDB9F2;
+  --ok: #1B8F4F;
+  --ok-ink: #0E4D2A;
+  --ok-soft: #DDF4E6;
+  --ok-edge: #9ED8B5;
+  --warn: #A86300;
+  --warn-ink: #5C3700;
+  --warn-soft: #FFEFD2;
+  --warn-edge: #F0C98A;
+  --bad: #C23B2A;
+  --bad-ink: #7A1E12;
+  --bad-soft: #FCE3DF;
+  --soft: #F1F4F9;
+  --nav: #151A24;
+  --nav-ink: #E6EAF2;
+  --nav-muted: #9AA3B5;
+  --accent: #F0821A;
+  --accent-soft: #FFF1E2;
+  /* un color por capa (n = 1, 2, 3, 4) en la configuración electrónica */
+  --n1: #C8442B; --n1-soft: #FBE1DB;
+  --n2: #9A6400; --n2-soft: #FCEBC2;
+  --n3: #1C7D4A; --n3-soft: #D5EFDF;
+  --n4: #2459C4; --n4-soft: #DCE7FB;
+  --blk-s: #FCE3D6; --blk-p: #DDF0E2; --blk-d: #E2E6F8;
+  --f-display: 'Fredoka', 'Atkinson Hyperlegible', system-ui, sans-serif;
+  --f-body: 'Atkinson Hyperlegible', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--f-body); font-size: 15px; line-height: 1.45; }
+button { font: inherit; color: inherit; }
+button:focus-visible, [tabindex]:focus-visible, input:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+#app { min-height: 100%; display: flex; flex-direction: column; }
+main { flex: 1; padding-block: 14px 18px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.view { max-width: 1260px; margin: 0 auto; }
+.screen-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 14px; margin-bottom: 10px; }
+.screen-head h2 { margin: 0; font: 600 24px/1.15 var(--f-display); text-wrap: balance; }
+.screen-head p { margin: 0; color: var(--muted); max-width: 70ch; }
+.screen { display: grid; grid-template-columns: minmax(0, 1fr) 330px; gap: 14px; align-items: start; }
+@media (max-width: 920px) { .screen { grid-template-columns: minmax(0, 1fr); } }
+.maincol { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; min-width: 0; }
+.maincol > * { min-width: 0; }
+.stage { background: var(--stage); border: 1px solid var(--line); border-radius: 10px; position: relative; min-width: 0; overflow: hidden; }
+.stage svg { display: block; width: 100%; height: auto; touch-action: none; user-select: none; -webkit-user-select: none; }
+.stage canvas { display: block; width: 100%; height: auto; }
+.stage-msg { min-height: 44px; padding: 10px 14px; border-top: 1px solid var(--line); font-size: 15px; color: var(--ink); background: #FAFBFD; }
+.stage-msg.warn { background: var(--warn-soft); color: var(--warn-ink); }
+.stage-msg.ok { background: var(--ok-soft); color: var(--ok-ink); }
+.side { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.panel { background: var(--panel); border: 1px solid var(--panel-edge); border-radius: 8px; padding: 10px 12px 12px; }
+.panel h3 { margin: 0 0 8px; font: 600 16px/1.2 var(--f-display); color: var(--panel-head); }
+.panel p { margin: 0 0 6px; }
+.panel.plain { background: var(--stage); border-color: var(--line); }
+.facts { display: grid; grid-template-columns: auto 1fr; gap: 3px 12px; margin: 0; font-variant-numeric: tabular-nums; }
+.facts dt { color: var(--muted); }
+.facts dd { margin: 0; font-weight: 700; }
+.status { border-radius: 8px; padding: 8px 10px; font-weight: 700; }
+.status.ok { background: var(--ok-soft); color: var(--ok-ink); border: 1px solid var(--ok-edge); }
+.status.warn { background: var(--warn-soft); color: var(--warn-ink); border: 1px solid var(--warn-edge); }
+.status.neutral { background: var(--soft); color: var(--ink); border: 1px solid var(--line); }
+.row { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.btn { border: 1px solid #B9C3D3; background: var(--stage); border-radius: 8px; padding: 7px 12px; cursor: pointer; font-weight: 700; }
+.btn:hover { background: #F2F5FA; }
+.btn[aria-pressed="true"] { background: var(--ink); color: #FFFFFF; border-color: var(--ink); }
+.btn.small { padding: 4px 10px; font-size: 14px; }
+.btn.primary { background: var(--electron); color: #FFFFFF; border-color: var(--electron-dark); }
+.btn.primary:hover { background: var(--electron-dark); }
+.btn:disabled { opacity: .45; cursor: not-allowed; }
+.linkbtn { border: 0; background: none; padding: 0; color: var(--electron-dark); font-weight: 700; text-decoration: underline; cursor: pointer; }
+.stepper { display: inline-flex; align-items: center; gap: 8px; }
+.stepper output { min-width: 1.2em; text-align: center; font-weight: 700; font-variant-numeric: tabular-nums; }
+.reset { width: 48px; height: 48px; border-radius: 50%; border: 2px solid #B85F0B; background: var(--accent); cursor: pointer; display: grid; place-items: center; flex: none; }
+.reset svg { width: 26px; height: 26px; }
+.reset-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.reset-row span { color: var(--muted); font-size: 14px; }
+.ptable { display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 3px; }
+.ptable button { aspect-ratio: 1; border: 1px solid #9AA6B8; border-radius: 4px; padding: 0; font-weight: 700; font-size: 13px; cursor: pointer; }
+.ptable .k-m { background: #DCE3ED; }
+.ptable .k-nm { background: #D4F1DE; }
+.ptable .k-ng { background: #E7DCFB; }
+.ptable button[aria-pressed="true"] { outline: 3px solid var(--accent); outline-offset: -1px; background: var(--stage); }
+.legend { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 6px; font-size: 13px; color: var(--muted); }
+.legend i { display: inline-block; width: 11px; height: 11px; border-radius: 3px; margin-right: 4px; vertical-align: -1px; border: 1px solid #9AA6B8; }
+.chips { display: flex; flex-wrap: wrap; gap: 5px; }
+.chips .btn { min-width: 44px; }
+.palette { display: flex; flex-wrap: wrap; gap: 8px; }
+.palette button { width: 46px; height: 46px; border-radius: 50%; border: 2px solid rgba(0,0,0,.25); font-weight: 700; font-size: 16px; cursor: pointer; }
+.checklist { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px 10px; font-weight: 700; }
+.checklist li { display: flex; align-items: center; gap: 6px; }
+.checklist li::before { content: ""; width: 16px; height: 16px; border-radius: 4px; border: 2px solid #9AA6B8; background: var(--stage); flex: none; }
+.checklist li.done { color: var(--ok); }
+.checklist li.done::before { background: var(--ok); border-color: var(--ok); box-shadow: inset 0 0 0 3px #FFFFFF; }
+.mols { display: grid; gap: 6px; }
+.mol { border-radius: 8px; padding: 6px 9px; background: var(--stage); border: 1px solid var(--line); }
+.mol strong { font-size: 18px; }
+.mol.ok { border-color: var(--ok-edge); background: var(--ok-soft); }
+.success { border-radius: 10px; padding: 10px 12px; background: var(--ok-soft); border: 1px solid var(--ok-edge); }
+.success .big { font: 600 30px/1.1 var(--f-display); color: var(--ok-ink); }
+.toggle { display: flex; align-items: center; gap: 8px; cursor: pointer; font-weight: 700; }
+.toggle input { width: 18px; height: 18px; accent-color: var(--electron); }
+.meter { display: flex; align-items: center; gap: 12px; }
+.meter svg { width: 64px; height: 64px; flex: none; }
+.meter b { font-size: 22px; font-variant-numeric: tabular-nums; }
+
+/* Guía paso a paso */
+.guide { background: var(--stage); border: 2px solid var(--electron-dark); border-radius: 10px; overflow: hidden; }
+.guide-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; background: var(--electron-dark); color: #FFFFFF; padding: 7px 12px; font: 600 16px/1.2 var(--f-display); }
+.gdots { display: flex; gap: 5px; }
+.gdots i { width: 10px; height: 10px; border-radius: 50%; background: rgba(255, 255, 255, .3); }
+.gdots i.done { background: #FFFFFF; }
+.gdots i.now { outline: 2px solid #F5D24A; outline-offset: 1px; }
+.guide-body { padding: 10px 12px 12px; display: grid; gap: 10px; }
+.guide-body p { margin: 0; }
+.gtask { display: grid; gap: 4px; }
+.gtag { justify-self: start; font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--electron-dark); background: #E4ECFC; border-radius: 4px; padding: 1px 7px; }
+.gtag.think { color: #6B3FB8; background: #EEE6FB; }
+.gopts { display: grid; gap: 6px; }
+.gopts .btn { text-align: left; font-weight: 700; }
+.gopts .btn.right { background: var(--ok-soft); border-color: var(--ok); color: var(--ok-ink); opacity: 1; }
+.gopts .btn.wrong { background: var(--bad-soft); border-color: var(--bad); color: var(--bad-ink); }
+.gwait { color: var(--muted); font-size: 14px; font-style: italic; }
+.ghint { background: var(--warn-soft); border: 1px solid var(--warn-edge); color: var(--warn-ink); border-radius: 8px; padding: 7px 10px; font-size: 14px; }
+.learn { background: var(--ok-soft); border: 1px solid var(--ok-edge); border-radius: 8px; padding: 8px 10px; display: grid; gap: 3px; }
+.learn b.lt { font: 600 16px/1.2 var(--f-display); color: var(--ok-ink); }
+.gnav { display: flex; justify-content: space-between; align-items: center; gap: 6px; flex-wrap: wrap; }
+.gskip { border: 0; background: none; color: var(--muted); font-size: 13px; text-decoration: underline; cursor: pointer; padding: 2px; }
+.gsum { margin: 0; padding-left: 18px; display: grid; gap: 6px; }
+.gsum li::marker { color: var(--ok); }
+
+/* Configuración electrónica */
+.cfg-line { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 12px; padding: 10px 14px 4px; border-top: 1px solid var(--line); font: 600 27px/1.25 var(--f-display); min-height: 50px; }
+.cfg-line sup { font-size: .6em; }
+.cfg-empty { font: 400 16px var(--f-body); color: var(--muted); align-self: center; }
+.cfg-abbr { padding: 0 14px 10px; color: var(--muted); font-size: 14px; min-height: 24px; }
+.cn1 { color: var(--n1); } .cn2 { color: var(--n2); } .cn3 { color: var(--n3); } .cn4 { color: var(--n4); }
+.ptwrap { overflow-x: auto; padding-bottom: 2px; }
+.ptable36 { display: grid; grid-template-columns: repeat(18, minmax(31px, 1fr)); gap: 3px; min-width: 600px; }
+.ptable36 button { height: 42px; border: 1px solid #9AA6B8; border-radius: 4px; padding: 1px 0 0; cursor: pointer; display: grid; place-content: center; line-height: 1.05; font-weight: 700; font-size: 14px; }
+.ptable36 button small { font-size: 10px; font-weight: 400; color: var(--muted); }
+.ptable36 .b-s { background: var(--blk-s); } .ptable36 .b-p { background: var(--blk-p); } .ptable36 .b-d { background: var(--blk-d); }
+.ptable36 button[aria-pressed="true"] { outline: 3px solid var(--accent); outline-offset: -1px; background: var(--stage); }
+.anat { display: flex; justify-content: center; align-items: baseline; gap: 2px; font: 600 46px/1 var(--f-display); padding: 6px 0 2px; }
+.anat sup { font-size: .55em; }
+.anat-list { display: grid; grid-template-columns: auto 1fr; gap: 3px 10px; margin: 6px 0 0; }
+.anat-list dt { font: 600 18px/1.2 var(--f-display); text-align: center; min-width: 1.4em; }
+.anat-list dd { margin: 0; }
+.caps { margin-top: 6px; font-size: 13px; color: var(--muted); }
+.note-x { font-size: 14px; background: var(--soft); border: 1px solid var(--line); border-radius: 8px; padding: 7px 10px; }
+
+/* Barra de pantallas */
+.navbar { position: sticky; bottom: 0; z-index: 5; background: var(--nav); color: var(--nav-ink); display: flex; align-items: center; gap: 10px; padding-block: 6px calc(6px + env(safe-area-inset-bottom, 0px)); padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.navbar .brand { font: 600 17px var(--f-display); white-space: nowrap; margin-right: auto; }
+.navbtns { display: flex; gap: 4px; overflow-x: auto; }
+.navbtn { background: transparent; border: 0; border-radius: 6px; padding: 4px 6px 3px; color: var(--nav-muted); cursor: pointer; display: grid; justify-items: center; gap: 2px; font-size: 12px; min-width: 58px; }
+.navbtn svg { width: 40px; height: 28px; border-radius: 4px; background: #FFFFFF; }
+.navbtn.home svg { background: transparent; }
+.navbtn[aria-current="page"] { color: #FFFFFF; }
+.navbtn[aria-current="page"] svg { outline: 2px solid #F5D24A; }
+@media (max-width: 700px) { .navbar .brand { display: none; } .navbtns { width: 100%; justify-content: space-between; } .navbtn { min-width: 0; flex: 1; font-size: 11px; padding-inline: 2px; } .navbtn svg { width: 34px; height: 24px; } }
+
+/* Portada */
+.hero { display: grid; gap: 6px; margin: 8px 0 18px; }
+.hero h1 { margin: 0; font: 600 clamp(32px, 5vw, 46px)/1.05 var(--f-display); text-wrap: balance; }
+.hero p { margin: 0; color: var(--muted); font-size: 17px; max-width: 64ch; }
+.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 12px; }
+.card { background: var(--stage); border: 1px solid var(--line); border-radius: 12px; padding: 0; cursor: pointer; text-align: left; overflow: hidden; display: flex; flex-direction: column; }
+.card:hover { border-color: #8EA2C4; box-shadow: 0 4px 14px rgba(28, 35, 51, .08); }
+.card svg { display: block; width: 100%; height: auto; background: #F7F9FC; border-bottom: 1px solid var(--line); }
+.card .txt { padding: 10px 12px 12px; display: grid; gap: 2px; }
+.card b { font: 600 18px var(--f-display); }
+.card span { color: var(--muted); font-size: 14px; }
+.howto { margin-top: 18px; display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; max-width: 980px; }
+.howto div { background: var(--stage); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; }
+.howto b { display: block; font: 600 16px var(--f-display); margin-bottom: 2px; }
+.note { margin-top: 18px; color: var(--muted); font-size: 13px; }
+.note a { color: var(--electron-dark); }
+
+/* Reto */
+.levels { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; }
+.level { background: var(--stage); border: 2px solid var(--line); border-radius: 12px; padding: 14px; cursor: pointer; text-align: left; display: grid; gap: 6px; }
+.level:hover { border-color: var(--electron); }
+.level b { font: 600 20px var(--f-display); }
+.level span { color: var(--muted); }
+.stars { color: #E2A400; font-size: 22px; letter-spacing: 2px; }
+.stars .off { color: #CDD4DF; }
+.qcard { position: relative; overflow: hidden; background: var(--stage); border: 1px solid var(--line); border-radius: 12px; padding: 16px; display: grid; gap: 12px; max-width: 760px; }
+.qtop { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; color: var(--muted); font-weight: 700; font-variant-numeric: tabular-nums; }
+.qprompt { font-size: 18px; font-weight: 700; margin: 0; }
+.qbig { font: 600 34px/1.1 var(--f-display); text-align: center; padding: 12px; background: #F4F7FB; border-radius: 10px; }
+.qopts { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px; }
+.qopts .btn { font-size: 18px; padding: 12px; }
+.qopts.long { grid-template-columns: minmax(0, 1fr); }
+.qopts.long .btn { font-size: 17px; text-align: left; }
+.qopts .btn.right { background: var(--ok-soft); border-color: var(--ok); color: var(--ok-ink); }
+.qopts .btn.wrong { background: var(--bad-soft); border-color: var(--bad); color: var(--bad-ink); }
+.qfeedback { border-radius: 8px; padding: 10px 12px; }
+.dots { display: flex; gap: 5px; }
+.dots i { width: 12px; height: 12px; border-radius: 50%; background: #D5DCE6; }
+.dots i.ok { background: var(--ok); }
+.dots i.half { background: #E2A400; }
+.dots i.ko { background: var(--bad); }
+.dots i.now { outline: 2px solid var(--electron); outline-offset: 1px; }
+
+/* Texto de los dibujos */
+.svgt { font-family: var(--f-body); fill: var(--ink); }
+.atom-sym { font-family: var(--f-display); font-weight: 600; font-size: 22px; text-anchor: middle; }
+.badge-t { font-family: var(--f-body); font-weight: 700; font-size: 15px; fill: #FFFFFF; text-anchor: middle; }
+.small-t { font-family: var(--f-body); font-size: 13px; fill: var(--muted); text-anchor: middle; }
+.lbl { font-family: var(--f-body); font-size: 13px; font-weight: 700; paint-order: stroke; stroke: #FFFFFF; stroke-width: 4px; stroke-linejoin: round; }
+.drag-e { cursor: grab; }
+/* Aviso de acierto dentro del recuadro de la simulación */
+#yay { position: absolute; inset: 0; z-index: 4; display: grid; place-items: center; background: rgba(27, 143, 79, 0.10); opacity: 0; pointer-events: none; transition: opacity .25s ease; }
+#yay.show { opacity: 1; }
+.yay-box { display: grid; justify-items: center; gap: 10px; transform: scale(.8); transition: transform .35s cubic-bezier(.2, 1.6, .4, 1); }
+#yay.show .yay-box { transform: scale(1); }
+.yay-box svg { width: clamp(70px, 16vw, 112px); height: auto; filter: drop-shadow(0 6px 16px rgba(27, 143, 79, .35)); }
+.yay-box svg path { stroke-dasharray: 90; stroke-dashoffset: 90; }
+#yay.show .yay-box svg path { animation: draw-check .45s .12s ease forwards; }
+@keyframes draw-check { to { stroke-dashoffset: 0; } }
+.yay-box span { font: 600 clamp(18px, 3vw, 24px)/1.2 var(--f-display); color: var(--ok-ink); background: rgba(255, 255, 255, .88); padding: 4px 16px; border-radius: 999px; text-align: center; max-width: 90vw; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } .yay-box svg path { stroke-dasharray: none; stroke-dashoffset: 0; } }
+</style>
+
+<div id="app">
+<main>
+
+<!-- ============ PORTADA ============ -->
+<section class="view" id="v-home">
+  <div class="hero">
+    <h1>Taller de enlaces</h1>
+    <p>Simulaciones para descubrir cómo se ordenan los electrones en el átomo y por qué y cómo se unen los átomos. Cada pantalla tiene una guía: haz lo que te pide y la propia simulación te explica lo que acaba de pasar.</p>
+  </div>
+  <div class="cards">
+    <button class="card" data-go="configuracion">
+      <svg viewBox="0 0 220 120" aria-hidden="true"><g fill="#FFFFFF" stroke="#9AA6B8"><rect x="62" y="80" width="22" height="22" rx="3" fill="#FBE1DB"/><rect x="62" y="48" width="22" height="22" rx="3" fill="#FCEBC2"/><rect x="104" y="20" width="22" height="22" rx="3" fill="#FCEBC2"/><rect x="130" y="20" width="22" height="22" rx="3" fill="#FCEBC2"/><rect x="156" y="20" width="22" height="22" rx="3"/></g><g stroke="#1C2333" stroke-width="2.2" stroke-linecap="round" fill="none"><path d="M69 98v-14M66 87l3-3 3 3M77 84v14M74 95l3 3 3-3"/><path d="M69 66v-14M66 55l3-3 3 3M77 52v14M74 63l3 3 3-3"/><path d="M115 38v-14M112 27l3-3 3 3"/><path d="M141 38v-14M138 27l3-3 3 3"/></g><g font-family="Fredoka, sans-serif" font-size="14" font-weight="600"><text x="36" y="96" fill="#C8442B">1s</text><text x="36" y="64" fill="#9A6400">2s</text><text x="78" y="36" fill="#9A6400">2p</text></g><path d="M20 108V14" stroke="#586174" stroke-width="2"/><path d="M15 20l5-7 5 7" fill="none" stroke="#586174" stroke-width="2"/></svg>
+      <span class="txt"><b>1 · Configuración electrónica</b><span>Coloca los electrones en los subniveles, de menor a mayor energía.</span></span>
+    </button>
+    <button class="card" data-go="octeto">
+      <svg viewBox="0 0 220 120" aria-hidden="true"><circle cx="110" cy="60" r="16" fill="#E2583E"/><circle cx="110" cy="60" r="32" fill="none" stroke="#9AA6B8" stroke-dasharray="4 4"/><circle cx="110" cy="60" r="50" fill="none" stroke="#2F6FE0" stroke-width="2" stroke-dasharray="5 5"/><g fill="#2F6FE0"><circle cx="110" cy="28" r="5"/><circle cx="110" cy="92" r="5"/><circle cx="160" cy="60" r="5"/><circle cx="60" cy="60" r="5"/><circle cx="145" cy="25" r="5"/><circle cx="75" cy="95" r="5"/><circle cx="145" cy="95" r="5"/><circle cx="75" cy="25" r="5"/><circle cx="110" cy="10" r="5"/></g></svg>
+      <span class="txt"><b>2 · Octeto</b><span>Gana o pierde electrones hasta parecerte a un gas noble.</span></span>
+    </button>
+    <button class="card" data-go="ionico">
+      <svg viewBox="0 0 220 120" aria-hidden="true"><circle cx="75" cy="60" r="26" fill="#AEBBCD" stroke="#6D7C92" stroke-width="2"/><circle cx="148" cy="60" r="30" fill="#8ED6A6" stroke="#4E9C6B" stroke-width="2"/><text x="75" y="67" text-anchor="middle" font-family="Fredoka, sans-serif" font-size="20" font-weight="600">Na</text><text x="148" y="67" text-anchor="middle" font-family="Fredoka, sans-serif" font-size="20" font-weight="600">Cl</text><path d="M96 34 q16 -18 32 -4" fill="none" stroke="#F0821A" stroke-width="3"/><circle cx="112" cy="24" r="5" fill="#2F6FE0"/></svg>
+      <span class="txt"><b>3 · Enlace iónico</b><span>Pasa electrones del metal al no metal y forma iones.</span></span>
+    </button>
+    <button class="card" data-go="covalente">
+      <svg viewBox="0 0 220 120" aria-hidden="true"><line x1="88" y1="60" x2="132" y2="60" stroke="#3B4252" stroke-width="4"/><circle cx="74" cy="60" r="22" fill="#F2F4F7" stroke="#8C95A6" stroke-width="2"/><circle cx="148" cy="60" r="26" fill="#55B85A" stroke="#3D8B42" stroke-width="2"/><text x="74" y="67" text-anchor="middle" font-family="Fredoka, sans-serif" font-size="19" font-weight="600">H</text><text x="148" y="67" text-anchor="middle" font-family="Fredoka, sans-serif" font-size="19" font-weight="600" fill="#fff">Cl</text><circle cx="104" cy="60" r="4.5" fill="#2F6FE0"/><circle cx="116" cy="60" r="4.5" fill="#2F6FE0"/></svg>
+      <span class="txt"><b>4 · Enlace covalente</b><span>Une átomos compartiendo pares de electrones.</span></span>
+    </button>
+    <button class="card" data-go="metalico">
+      <svg viewBox="0 0 220 120" aria-hidden="true"><rect x="30" y="18" width="160" height="84" rx="10" fill="#E6EEFB"/><g fill="#AEBBCD" stroke="#6D7C92"><circle cx="55" cy="40" r="11"/><circle cx="95" cy="40" r="11"/><circle cx="135" cy="40" r="11"/><circle cx="175" cy="40" r="11"/><circle cx="55" cy="80" r="11"/><circle cx="95" cy="80" r="11"/><circle cx="135" cy="80" r="11"/><circle cx="175" cy="80" r="11"/></g><g fill="#2F6FE0"><circle cx="75" cy="60" r="3.5"/><circle cx="115" cy="56" r="3.5"/><circle cx="152" cy="64" r="3.5"/><circle cx="40" cy="62" r="3.5"/><circle cx="118" cy="24" r="3.5"/><circle cx="77" cy="98" r="3.5"/></g></svg>
+      <span class="txt"><b>5 · Enlace metálico</b><span>Iones positivos en un mar de electrones.</span></span>
+    </button>
+    <button class="card" data-go="reto">
+      <svg viewBox="0 0 220 120" aria-hidden="true"><path d="M110 22 l11 24 26 3 -19 18 5 26 -23 -13 -23 13 5 -26 -19 -18 26 -3z" fill="#F5C33B" stroke="#C6930A" stroke-width="2"/></svg>
+      <span class="txt"><b>6 · Reto</b><span>Pon a prueba lo aprendido en cuatro niveles.</span></span>
+    </button>
+  </div>
+  <div class="howto">
+    <div><b>Sigue la guía</b>Cada pantalla tiene un recuadro azul con pasos. Haz lo que te pide o contesta la pregunta.</div>
+    <div><b>Lee la explicación</b>Cuando lo consigues, aparece en verde lo que acabas de descubrir. Después pasa al paso siguiente.</div>
+    <div><b>Experimenta</b>Puedes probar cosas por tu cuenta en cualquier momento. El botón naranja vuelve a empezar.</div>
+  </div>
+  <p class="note">Simulaciones de elaboración propia para un trabajo del Máster en Profesorado (UGR), inspiradas en el estilo de las simulaciones interactivas de <a href="https://phet.colorado.edu/es/" target="_blank" rel="noopener">PhET</a> (Universidad de Colorado Boulder). No son simulaciones oficiales de PhET.</p>
+</section>
+
+<!-- ============ 1. CONFIGURACIÓN ELECTRÓNICA ============ -->
+<section class="view" id="v-configuracion" hidden>
+  <div class="screen-head"><h2>Configuración electrónica</h2><p>Toca un subnivel para colocar en él un electrón. Los electrones se colocan de menor a mayor energía, y la configuración se va escribiendo debajo.</p></div>
+  <div class="screen">
+    <div class="maincol">
+      <div class="stage">
+        <svg id="svg0" viewBox="0 0 600 470" role="img" aria-label="Diagrama de niveles de energía, diagrama de Moeller y electrones por capa">
+          <defs><marker id="arr0" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#E07A12"/></marker></defs>
+          <g id="g0"></g>
+        </svg>
+        <div class="cfg-line" id="cfg0" aria-live="polite"></div>
+        <div class="cfg-abbr" id="abbr0"></div>
+        <div class="stage-msg" id="msg0" aria-live="polite">Toca el subnivel 1s, el más bajo del diagrama, para colocar el primer electrón.</div>
+      </div>
+      <div class="panel plain">
+        <h3>O elige un elemento de la tabla (Z = 1 a 36)</h3>
+        <div class="ptwrap"><div class="ptable36" id="pt0"></div></div>
+        <div class="legend"><span><i style="background:var(--blk-s)"></i>acaba en s (bloque s)</span><span><i style="background:var(--blk-p)"></i>acaba en p (bloque p)</span><span><i style="background:var(--blk-d)"></i>acaba en d (bloque d)</span></div>
+      </div>
+    </div>
+    <div class="side">
+      <section class="guide" id="guide-configuracion" aria-label="Guía paso a paso"></section>
+      <div class="panel plain">
+        <h3>Tu átomo</h3>
+        <dl class="facts" id="facts0"></dl>
+        <div class="row" style="margin-top:8px">
+          <button class="btn small" id="rem0" type="button">− Quitar electrón</button>
+          <button class="btn small" id="add0" type="button">+ Añadir electrón</button>
+        </div>
+      </div>
+      <div class="panel">
+        <h3>Cómo se lee</h3>
+        <div id="read0"></div>
+      </div>
+      <div class="reset-row"><span>Quitar todos los electrones</span><button class="reset" type="button" id="reset0" aria-label="Reiniciar la pantalla"><svg viewBox="0 0 24 24"><path d="M12 5a7 7 0 1 1-6.6 4.7" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/><path d="M4 4v6h6" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 2. OCTETO ============ -->
+<section class="view" id="v-octeto" hidden>
+  <div class="screen-head"><h2>Octeto</h2><p>Arrastra electrones de la última capa al recipiente, o del recipiente al átomo. ¿Cuándo queda igual que un gas noble?</p></div>
+  <div class="screen">
+    <div class="stage">
+      <svg id="svg1" viewBox="0 0 600 480" role="img" aria-label="Modelo de capas del átomo seleccionado">
+        <defs>
+          <radialGradient id="nuc" cx="40%" cy="35%" r="70%"><stop offset="0" stop-color="#FF9C7E"/><stop offset="1" stop-color="#D24A30"/></radialGradient>
+          <radialGradient id="bowl" cx="50%" cy="0%" r="100%"><stop offset="0" stop-color="#5D93F0"/><stop offset="1" stop-color="#1F4FB0"/></radialGradient>
+        </defs>
+        <g id="g1"></g><g id="o1"></g>
+      </svg>
+      <div class="stage-msg" id="msg1" aria-live="polite">Sodio: 11 protones y 11 electrones. Átomo neutro.</div>
+    </div>
+    <div class="side">
+      <section class="guide" id="guide-octeto" aria-label="Guía paso a paso"></section>
+      <div class="panel">
+        <h3>Elige un elemento</h3>
+        <div class="ptable" id="ptable"></div>
+        <div class="legend"><span><i style="background:#DCE3ED"></i>metal</span><span><i style="background:#D4F1DE"></i>no metal</span><span><i style="background:#E7DCFB"></i>gas noble</span></div>
+      </div>
+      <div class="panel plain">
+        <h3>Lo que ves</h3>
+        <dl class="facts" id="facts1"></dl>
+        <div class="row" style="margin-top:8px">
+          <button class="btn small" id="rem1" type="button">− Quitar electrón</button>
+          <button class="btn small" id="add1" type="button">+ Añadir electrón</button>
+        </div>
+        <label class="toggle" style="margin-top:10px"><input type="checkbox" id="names1" checked> Ver los nombres de las partes</label>
+      </div>
+      <div class="status" id="status1"></div>
+      <div class="reset-row"><span>Volver a empezar</span><button class="reset" type="button" id="reset1" aria-label="Reiniciar la pantalla"><svg viewBox="0 0 24 24"><path d="M12 5a7 7 0 1 1-6.6 4.7" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/><path d="M4 4v6h6" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 3. ENLACE IÓNICO ============ -->
+<section class="view" id="v-ionico" hidden>
+  <div class="screen-head"><h2>Enlace iónico</h2><p>Arrastra electrones de un átomo a otro (o toca el átomo que da y después el que recibe) hasta que todos tengan la última capa completa.</p></div>
+  <div class="screen">
+    <div class="stage">
+      <svg id="svg2" viewBox="0 0 600 470" role="img" aria-label="Átomos de un metal y un no metal con sus electrones de valencia"><g id="g2"></g><g id="o2"></g></svg>
+      <div class="stage-msg" id="msg2" aria-live="polite">El potasio y el flúor están listos. ¿Quién debería dar un electrón a quién?</div>
+    </div>
+    <div class="side">
+      <section class="guide" id="guide-ionico" aria-label="Guía paso a paso"></section>
+      <div class="panel">
+        <h3>Metal</h3>
+        <div class="chips" id="metals"></div>
+        <div class="row" style="margin-top:8px">Átomos: <span class="stepper"><button class="btn small" type="button" data-step="nm" data-d="-1" aria-label="Un átomo de metal menos">−</button><output id="nm-out">1</output><button class="btn small" type="button" data-step="nm" data-d="1" aria-label="Un átomo de metal más">+</button></span></div>
+      </div>
+      <div class="panel">
+        <h3>No metal</h3>
+        <div class="chips" id="nonmetals"></div>
+        <div class="row" style="margin-top:8px">Átomos: <span class="stepper"><button class="btn small" type="button" data-step="nn" data-d="-1" aria-label="Un átomo de no metal menos">−</button><output id="nn-out">1</output><button class="btn small" type="button" data-step="nn" data-d="1" aria-label="Un átomo de no metal más">+</button></span></div>
+      </div>
+      <div id="state2"></div>
+      <div class="reset-row"><span>Devolver los electrones</span><button class="reset" type="button" id="reset2" aria-label="Reiniciar la pantalla"><svg viewBox="0 0 24 24"><path d="M12 5a7 7 0 1 1-6.6 4.7" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/><path d="M4 4v6h6" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 4. ENLACE COVALENTE ============ -->
+<section class="view" id="v-covalente" hidden>
+  <div class="screen-head"><h2>Enlace covalente</h2><p>Añade átomos y muévelos. Para unir dos átomos, toca uno y después el otro: comparten un par de electrones. Toca un enlace para deshacerlo.</p></div>
+  <div class="screen">
+    <div class="stage">
+      <svg id="svg3" viewBox="0 0 600 470" role="img" aria-label="Zona de construcción de moléculas"><g id="g3"></g></svg>
+      <div class="stage-msg" id="msg3" aria-live="polite">Añade dos átomos de hidrógeno y únelos.</div>
+    </div>
+    <div class="side">
+      <section class="guide" id="guide-covalente" aria-label="Guía paso a paso"></section>
+      <div class="panel">
+        <h3>Añadir átomos</h3>
+        <div class="palette" id="palette3"></div>
+        <div class="row" style="margin-top:10px">
+          <button class="btn small" type="button" id="del3">Quitar el átomo elegido</button>
+        </div>
+        <label class="toggle" style="margin-top:10px"><input type="checkbox" id="dots3" checked> Ver los electrones compartidos</label>
+      </div>
+      <div class="panel plain"><h3>Tus moléculas</h3><div class="mols" id="mols3"></div></div>
+      <div class="panel"><h3>Más moléculas para construir</h3><ul class="checklist" id="check3"></ul></div>
+      <div class="reset-row"><span>Vaciar la mesa</span><button class="reset" type="button" id="reset3" aria-label="Reiniciar la pantalla"><svg viewBox="0 0 24 24"><path d="M12 5a7 7 0 1 1-6.6 4.7" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/><path d="M4 4v6h6" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 5. ENLACE METÁLICO ============ -->
+<section class="view" id="v-metalico" hidden>
+  <div class="screen-head"><h2>Enlace metálico</h2><p>En un metal, cada átomo suelta sus electrones de valencia, que se mueven libremente entre los iones positivos.</p></div>
+  <div class="screen">
+    <div class="stage">
+      <canvas id="cv4" width="600" height="370" aria-label="Red de iones metálicos con electrones en movimiento"></canvas>
+      <div class="stage-msg" id="msg4" aria-live="polite">Observa cómo se mueven los electrones. Después conecta la pila o golpea el metal.</div>
+    </div>
+    <div class="side">
+      <section class="guide" id="guide-metalico" aria-label="Guía paso a paso"></section>
+      <div class="panel">
+        <h3>Material</h3>
+        <div class="chips" id="mode4">
+          <button class="btn" type="button" data-mode="metal" aria-pressed="true">Metal</button>
+          <button class="btn" type="button" data-mode="ionic" aria-pressed="false">Cristal iónico (NaCl)</button>
+        </div>
+        <div class="chips" id="metal4" style="margin-top:8px">
+          <button class="btn small" type="button" data-sym="Na" aria-pressed="true">Sodio</button>
+          <button class="btn small" type="button" data-sym="Mg" aria-pressed="false">Magnesio</button>
+          <button class="btn small" type="button" data-sym="Al" aria-pressed="false">Aluminio</button>
+        </div>
+        <p id="info4" style="margin-top:8px"></p>
+      </div>
+      <div class="panel plain">
+        <h3>Experimentos</h3>
+        <label class="toggle"><input type="checkbox" id="pila4"> Conectar a una pila</label>
+        <div class="meter" style="margin-top:8px">
+          <svg viewBox="0 0 64 64" aria-hidden="true"><circle id="glow4" cx="32" cy="26" r="24" fill="#FFE27A" opacity="0"/><path d="M22 26a10 10 0 1 1 20 0c0 5-4 7-5 11H27c-1-4-5-6-5-11z" id="bulb4" fill="#E6EAF0" stroke="#7A8496" stroke-width="2"/><rect x="26" y="40" width="12" height="8" rx="2" fill="#9AA3B5"/></svg>
+          <div><div style="color:var(--muted)">Electrones que pasan</div><b id="cur4">0</b> <span style="color:var(--muted)">por segundo</span></div>
+        </div>
+        <div class="row" style="margin-top:10px">
+          <button class="btn primary" type="button" id="hit4">Golpear el material</button>
+          <button class="btn" type="button" id="pause4" aria-pressed="false">Pausar</button>
+        </div>
+      </div>
+      <div class="reset-row"><span>Volver a empezar</span><button class="reset" type="button" id="reset4" aria-label="Reiniciar la pantalla"><svg viewBox="0 0 24 24"><path d="M12 5a7 7 0 1 1-6.6 4.7" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/><path d="M4 4v6h6" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 6. RETO ============ -->
+<section class="view" id="v-reto" hidden>
+  <div class="screen-head"><h2>Reto</h2><p>Seis preguntas por nivel. Si aciertas a la primera ganas 2 puntos; a la segunda, 1. Después de cada pregunta verás la explicación.</p></div>
+  <div id="levels5" class="levels"></div>
+  <div id="play5" hidden></div>
+</section>
+
+</main>
+
+<div id="yay" aria-hidden="true"><div class="yay-box"><svg viewBox="0 0 128 128"><circle cx="64" cy="64" r="58" fill="#1B8F4F"/><circle cx="64" cy="64" r="58" fill="none" stroke="#FFFFFF" stroke-opacity=".35" stroke-width="4"/><path d="M38 66 L56 84 L92 46" fill="none" stroke="#FFFFFF" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/></svg><span></span></div></div>
+
+<nav class="navbar" aria-label="Pantallas">
+  <span class="brand">Taller de enlaces</span>
+  <div class="navbtns">
+    <button class="navbtn home" type="button" data-go="home" aria-label="Portada"><svg viewBox="0 0 40 28" aria-hidden="true"><path d="M8 14 20 4l12 10v11H8z" fill="#E6EAF2"/><rect x="17" y="17" width="6" height="8" fill="#151A24"/></svg>Inicio</button>
+    <button class="navbtn" type="button" data-go="configuracion"><svg viewBox="0 0 40 28" aria-hidden="true"><rect x="7" y="17" width="8" height="8" rx="1.5" fill="#FBE1DB" stroke="#9AA6B8"/><rect x="18" y="5" width="8" height="8" rx="1.5" fill="#FCEBC2" stroke="#9AA6B8"/><rect x="27" y="5" width="8" height="8" rx="1.5" fill="#FFFFFF" stroke="#9AA6B8"/><path d="M11 24v-6M22 12V6" stroke="#1C2333" stroke-width="1.6"/></svg>Configuración</button>
+    <button class="navbtn" type="button" data-go="octeto"><svg viewBox="0 0 40 28" aria-hidden="true"><circle cx="20" cy="14" r="4" fill="#E2583E"/><circle cx="20" cy="14" r="10" fill="none" stroke="#2F6FE0" stroke-dasharray="2 2"/><circle cx="30" cy="14" r="2.2" fill="#2F6FE0"/><circle cx="10" cy="14" r="2.2" fill="#2F6FE0"/></svg>Octeto</button>
+    <button class="navbtn" type="button" data-go="ionico"><svg viewBox="0 0 40 28" aria-hidden="true"><circle cx="13" cy="14" r="7" fill="#AEBBCD"/><circle cx="27" cy="14" r="8" fill="#8ED6A6"/><circle cx="20" cy="5" r="2.2" fill="#2F6FE0"/></svg>Iónico</button>
+    <button class="navbtn" type="button" data-go="covalente"><svg viewBox="0 0 40 28" aria-hidden="true"><line x1="13" y1="14" x2="27" y2="14" stroke="#3B4252" stroke-width="2"/><circle cx="12" cy="14" r="6" fill="#F2F4F7" stroke="#8C95A6"/><circle cx="28" cy="14" r="7" fill="#DE4B3A"/></svg>Covalente</button>
+    <button class="navbtn" type="button" data-go="metalico"><svg viewBox="0 0 40 28" aria-hidden="true"><g fill="#AEBBCD"><circle cx="10" cy="9" r="4"/><circle cx="20" cy="9" r="4"/><circle cx="30" cy="9" r="4"/><circle cx="10" cy="20" r="4"/><circle cx="20" cy="20" r="4"/><circle cx="30" cy="20" r="4"/></g><g fill="#2F6FE0"><circle cx="15" cy="14" r="1.6"/><circle cx="25" cy="15" r="1.6"/><circle cx="34" cy="14" r="1.6"/></g></svg>Metálico</button>
+    <button class="navbtn" type="button" data-go="reto"><svg viewBox="0 0 40 28" aria-hidden="true"><path d="M20 4l3 6 7 1-5 5 1 7-6-3-6 3 1-7-5-5 7-1z" fill="#F5C33B"/></svg>Reto</button>
+  </div>
+</nav>
+</div>
+
+<script>
+(() => {
+'use strict';
+
+/* ---------- utilidades ---------- */
+const NS = 'http://www.w3.org/2000/svg';
+const $ = (q, r = document) => r.querySelector(q);
+const $$ = (q, r = document) => [...r.querySelectorAll(q)];
+function S(tag, attrs, parent) {
+  const e = document.createElementNS(NS, tag);
+  if (attrs) for (const k in attrs) e.setAttribute(k, attrs[k]);
+  if (parent) parent.appendChild(e);
+  return e;
+}
+function T(parent, x, y, txt, attrs) {
+  const t = S('text', Object.assign({ x, y }, attrs || {}), parent);
+  t.textContent = txt;
+  return t;
+}
+function svgPt(svg, ev) {
+  const p = svg.createSVGPoint();
+  p.x = ev.clientX; p.y = ev.clientY;
+  return p.matrixTransform(svg.getScreenCTM().inverse());
+}
+const SUBD = '₀₁₂₃₄₅₆₇₈₉', SUPD = '⁰¹²³⁴⁵⁶⁷⁸⁹';
+const sub = n => n === 1 ? '' : String(n).split('').map(d => SUBD[+d]).join('');
+const sup = q => q === 0 ? '' : (Math.abs(q) > 1 ? String(Math.abs(q)).split('').map(d => SUPD[+d]).join('') : '') + (q > 0 ? '⁺' : '⁻');
+const supN = n => String(n).split('').map(d => SUPD[+d]).join('');
+const plainCharge = q => (Math.abs(q) > 1 ? Math.abs(q) : '') + (q > 0 ? '+' : '−');
+const gcd = (a, b) => b ? gcd(b, a % b) : a;
+const shuffle = a => { const r = a.slice(); for (let i = r.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [r[i], r[j]] = [r[j], r[i]]; } return r; };
+const RM = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+const YAY = document.getElementById('yay');
+function celebrate(text) {
+  // el aviso se coloca dentro del recuadro de la simulación que se está viendo
+  const y = YAY;
+  const view = document.querySelector('.view:not([hidden])');
+  const host = view && (view.querySelector('.stage') || view.querySelector('.qcard'));
+  if (host) {
+    if (y.parentNode !== host) host.appendChild(y);
+    const art = host.querySelector(':scope > svg, :scope > canvas');
+    y.style.position = 'absolute'; y.style.inset = '0 0 auto 0';
+    y.style.height = Math.round(art ? art.getBoundingClientRect().height : host.clientHeight) + 'px';
+  } else {
+    document.body.appendChild(y);
+    y.style.position = 'fixed'; y.style.inset = '0'; y.style.height = '';
+  }
+  y.querySelector('span').textContent = text;
+  y.classList.remove('show');
+  void y.offsetWidth;
+  y.classList.add('show');
+  clearTimeout(celebrate.t);
+  celebrate.t = setTimeout(() => y.classList.remove('show'), 1500);
+}
+function setMsg(id, text, kind) {
+  const el = document.getElementById(id);
+  el.textContent = text;
+  el.className = 'stage-msg' + (kind ? ' ' + kind : '');
+}
+
+/* ---------- datos de los elementos (Z ≤ 36) ---------- */
+// símbolo: [Z, número másico más común, nombre, tipo]
+const EL = {
+  H: [1, 1, 'Hidrógeno', 'nm'], He: [2, 4, 'Helio', 'ng'],
+  Li: [3, 7, 'Litio', 'm'], Be: [4, 9, 'Berilio', 'm'], B: [5, 11, 'Boro', 'nm'], C: [6, 12, 'Carbono', 'nm'],
+  N: [7, 14, 'Nitrógeno', 'nm'], O: [8, 16, 'Oxígeno', 'nm'], F: [9, 19, 'Flúor', 'nm'], Ne: [10, 20, 'Neón', 'ng'],
+  Na: [11, 23, 'Sodio', 'm'], Mg: [12, 24, 'Magnesio', 'm'], Al: [13, 27, 'Aluminio', 'm'], Si: [14, 28, 'Silicio', 'nm'],
+  P: [15, 31, 'Fósforo', 'nm'], S: [16, 32, 'Azufre', 'nm'], Cl: [17, 35, 'Cloro', 'nm'], Ar: [18, 40, 'Argón', 'ng'],
+  K: [19, 39, 'Potasio', 'm'], Ca: [20, 40, 'Calcio', 'm'],
+  Sc: [21, 45, 'Escandio', 'm'], Ti: [22, 48, 'Titanio', 'm'], V: [23, 51, 'Vanadio', 'm'], Cr: [24, 52, 'Cromo', 'm'],
+  Mn: [25, 55, 'Manganeso', 'm'], Fe: [26, 56, 'Hierro', 'm'], Co: [27, 59, 'Cobalto', 'm'], Ni: [28, 58, 'Níquel', 'm'],
+  Cu: [29, 63, 'Cobre', 'm'], Zn: [30, 64, 'Cinc', 'm'], Ga: [31, 69, 'Galio', 'm'], Ge: [32, 74, 'Germanio', 'nm'],
+  As: [33, 75, 'Arsénico', 'nm'], Se: [34, 80, 'Selenio', 'nm'], Br: [35, 79, 'Bromo', 'nm'], Kr: [36, 84, 'Kriptón', 'ng']
+};
+const SYMZ = Object.keys(EL).sort((a, b) => EL[a][0] - EL[b][0]);
+const lname = s => EL[s][2].toLowerCase();
+function shells(n) {
+  const caps = [2, 8, 8, 18], out = [];
+  let r = n;
+  for (const c of caps) { if (r <= 0) break; const t = Math.min(c, r); out.push(t); r -= t; }
+  return out;
+}
+const valence = z => { const s = shells(z); return s[s.length - 1]; };
+const NOBLE = { 2: 'helio', 10: 'neón', 18: 'argón' };
+
+/* ---------- configuración electrónica (orden de llenado) ---------- */
+const ORDER = [['1s', 1, 's', 2], ['2s', 2, 's', 2], ['2p', 2, 'p', 6], ['3s', 3, 's', 2], ['3p', 3, 'p', 6], ['4s', 4, 's', 2], ['3d', 3, 'd', 10], ['4p', 4, 'p', 6]]
+  .map(([l, n, t, cap]) => ({ l, n, t, cap, boxes: cap / 2 }));
+function fill(e) { let r = e; return ORDER.map(o => { const c = Math.min(o.cap, Math.max(0, r)); r -= c; return c; }); }
+const cfgTerms = e => { const f = fill(e); return ORDER.map((o, i) => Object.assign({ c: f[i] }, o)).filter(t => t.c > 0); };
+const strFromCounts = f => ORDER.map((o, i) => f[i] ? o.l + supN(f[i]) : '').filter(Boolean).join(' ');
+const cfgStr = e => strFromCounts(fill(e));
+function byShell(e) { const s = [0, 0, 0, 0]; cfgTerms(e).forEach(t => { s[t.n - 1] += t.c; }); while (s.length && !s[s.length - 1]) s.pop(); return s; }
+const nextIdx = e => fill(e).findIndex((c, i) => c < ORDER[i].cap);
+const valenceCfg = e => { const s = byShell(e); return s.length ? s[s.length - 1] : 0; };
+const blockOf = z => { const t = cfgTerms(z); return t.length ? t[t.length - 1].t : 's'; };
+
+/* ---------- guía paso a paso (común a todas las pantallas) ---------- */
+// Cada paso es una acción (check() dice si ya está hecha) o una pregunta (q).
+// Al completarlo aparece la explicación (title + learn).
+const G = {};
+function makeGuide(key, steps, summary) {
+  const box = document.getElementById('guide-' + key);
+  const st = { i: 0, fin: false, done: steps.map(() => false), wrong: steps.map(() => new Set()), hint: false };
+  function render() {
+    const n = steps.length;
+    const dots = steps.map((_, k) => `<i class="${st.done[k] ? 'done' : ''}${!st.fin && k === st.i ? ' now' : ''}"></i>`).join('');
+    let h = `<div class="guide-head"><span>${st.fin ? 'Resumen' : `Guía · paso ${st.i + 1} de ${n}`}</span><span class="gdots" aria-hidden="true">${dots}</span></div><div class="guide-body">`;
+    if (st.fin) {
+      h += `<p><b>Lo que has aprendido en esta pantalla:</b></p><ul class="gsum">${summary.map(s => `<li>${s}</li>`).join('')}</ul>
+        <div class="gnav"><button class="btn small" type="button" data-g="restart">Repetir la guía</button></div>`;
+    } else {
+      const s = steps[st.i], done = st.done[st.i];
+      h += `<div class="gtask"><span class="gtag${s.q ? ' think' : ''}">${s.q ? 'Piensa' : 'Haz esto'}</span><p>${s.do}</p></div>`;
+      if (s.q) {
+        h += '<div class="gopts">' + s.q.opts.map((o, k) => {
+          const cls = done && k === s.q.ans ? ' right' : st.wrong[st.i].has(k) ? ' wrong' : '';
+          return `<button class="btn${cls}" type="button" data-g="opt" data-k="${k}"${done || st.wrong[st.i].has(k) ? ' disabled' : ''}>${o}</button>`;
+        }).join('') + '</div>';
+      }
+      if (done) h += `<div class="learn"><b class="lt">${s.title}</b><span>${s.learn}</span></div>`;
+      else if (s.q && st.wrong[st.i].size) h += `<div class="ghint">No es esa. ${s.q.hint}</div>`;
+      else if (!s.q) h += st.hint ? `<div class="ghint">Pista: ${s.hint}</div>` : '<p class="gwait">Cuando lo consigas, aquí aparecerá la explicación.</p>';
+      h += `<div class="gnav"><button class="btn small" type="button" data-g="prev"${st.i === 0 ? ' disabled' : ''}>← Anterior</button>`;
+      if (!done && !s.q && !st.hint) h += '<button class="gskip" type="button" data-g="hint">No me sale: ver pista</button>';
+      else if (!done) h += '<button class="gskip" type="button" data-g="skip">Saltar este paso</button>';
+      h += `<button class="btn small primary" type="button" data-g="next"${done ? '' : ' disabled'}>${st.i === n - 1 ? 'Ver resumen' : 'Siguiente →'}</button></div>`;
+    }
+    box.innerHTML = h + '</div>';
+  }
+  function go(i) {
+    st.i = i; st.fin = false; st.hint = false;
+    const s = steps[i];
+    if (s.enter) s.enter();
+    render(); update();
+  }
+  function update() {
+    if (st.fin) return;
+    const s = steps[st.i];
+    if (!s.q && !st.done[st.i] && s.check()) { st.done[st.i] = true; render(); }
+  }
+  box.addEventListener('click', ev => {
+    const b = ev.target.closest('[data-g]'); if (!b || b.disabled) return;
+    const a = b.dataset.g, s = steps[st.i];
+    if (a === 'opt') {
+      const k = +b.dataset.k;
+      if (k === s.q.ans) st.done[st.i] = true; else st.wrong[st.i].add(k);
+      render();
+    } else if (a === 'next') { if (st.i < steps.length - 1) go(st.i + 1); else { st.fin = true; render(); } }
+    else if (a === 'prev') go(st.i - 1);
+    else if (a === 'hint') { st.hint = true; render(); }
+    else if (a === 'skip') { st.done[st.i] = true; render(); }
+    else if (a === 'restart') { st.done = steps.map(() => false); st.wrong = steps.map(() => new Set()); go(0); }
+  });
+  render();
+  return { update, render };
+}
+const guideUpdate = key => { if (G[key]) G[key].update(); };
+
+/* ---------- navegación ---------- */
+const VIEWS = ['home', 'configuracion', 'octeto', 'ionico', 'covalente', 'metalico', 'reto'];
+function show(id) {
+  if (!VIEWS.includes(id)) id = 'home';
+  $$('.view').forEach(v => { v.hidden = v.id !== 'v-' + id; });
+  $$('.navbtn').forEach(b => b.setAttribute('aria-current', b.dataset.go === id ? 'page' : 'false'));
+  if (id === 'metalico') metal.start(); else metal.stop();
+  if (id === 'reto') game.showLevels();
+  if (location.hash !== '#' + id) { try { history.replaceState(null, '', '#' + id); } catch (e) { /* sin historial */ } }
+  window.scrollTo(0, 0);
+}
+document.addEventListener('click', ev => {
+  const b = ev.target.closest('[data-go]');
+  if (b) show(b.dataset.go);
+});
+
+/* =====================================================================
+   1. CONFIGURACIÓN ELECTRÓNICA
+   ===================================================================== */
+const s0 = { e: 0 };
+const svg0 = $('#svg0');
+const Y0 = [432, 378, 336, 276, 234, 174, 134, 90];  // altura de cada subnivel: más arriba, más energía
+const NCOL = n => `var(--n${n})`, NSOFT = n => `var(--n${n}-soft)`;
+function arrowPath(x, y, up) {
+  return up ? `M${x} ${y + 9}V${y - 9}M${x - 4} ${y - 4}L${x} ${y - 9}L${x + 4} ${y - 4}` : `M${x} ${y - 9}V${y + 9}M${x - 4} ${y + 4}L${x} ${y + 9}L${x + 4} ${y + 4}`;
+}
+function render0() {
+  const g = $('#g0', svg0); g.innerHTML = '';
+  const e = s0.e, f = fill(e), ni = nextIdx(e);
+  // eje de energía
+  S('path', { d: 'M24 456V52', stroke: '#586174', 'stroke-width': 2, fill: 'none' }, g);
+  S('path', { d: 'M18 60L24 48L30 60', stroke: '#586174', 'stroke-width': 2, fill: 'none' }, g);
+  T(g, 14, 256, 'Energía', { class: 'svgt', 'font-size': 14, 'font-weight': 700, fill: 'var(--muted)', transform: 'rotate(-90 14 256)', 'text-anchor': 'middle' });
+  T(g, 160, 30, 'Subniveles y cajas (orbitales)', { class: 'svgt', 'font-size': 14, 'font-weight': 700, 'text-anchor': 'middle' });
+  ORDER.forEach((o, i) => {
+    const y = Y0[i], c = f[i], row = S('g', { 'data-row': i, style: 'cursor:pointer' }, g);
+    const w = o.boxes * 36 + 64;
+    S('rect', { x: 34, y: y - 21, width: 268, height: 42, fill: 'rgba(0,0,0,0)' }, row);
+    if (i === ni) {
+      S('rect', { x: 36, y: y - 20, width: w, height: 40, rx: 8, fill: 'var(--accent-soft)', stroke: 'var(--accent)', 'stroke-width': 2, 'stroke-dasharray': '6 4' }, row);
+      S('path', { d: `M38 ${y - 7}L48 ${y}L38 ${y + 7}z`, fill: 'var(--accent)' }, row);
+    }
+    T(row, 54, y + 6, o.l, { class: 'svgt', 'font-family': 'Fredoka, sans-serif', 'font-size': 19, 'font-weight': 600, fill: NCOL(o.n) });
+    const up = Math.min(c, o.boxes), down = Math.max(0, c - o.boxes);
+    for (let b = 0; b < o.boxes; b++) {
+      const x = 88 + b * 36;
+      S('rect', { x, y: y - 15, width: 30, height: 30, rx: 4, fill: c ? NSOFT(o.n) : '#FFFFFF', stroke: c ? NCOL(o.n) : '#9AA6B8', 'stroke-width': 1.5 }, row);
+      if (b < up) S('path', { d: arrowPath(x + 10, y, true), stroke: 'var(--ink)', 'stroke-width': 2.2, fill: 'none', 'stroke-linecap': 'round' }, row);
+      if (b < down) S('path', { d: arrowPath(x + 20, y, false), stroke: 'var(--ink)', 'stroke-width': 2.2, fill: 'none', 'stroke-linecap': 'round' }, row);
+    }
+    T(row, 88 + o.boxes * 36 + 4, y + 5, `${c}/${o.cap}`, { class: 'svgt', 'font-size': 13, fill: c === o.cap ? NCOL(o.n) : 'var(--muted)', 'font-weight': c === o.cap ? 700 : 400 });
+  });
+  // diagrama de Moeller
+  const MX = { s: 384, p: 432, d: 480, f: 528 }, MY = n => 52 + n * 34, LS = ['s', 'p', 'd', 'f'];
+  T(g, 456, 30, 'Orden de llenado (Moeller)', { class: 'svgt', 'font-size': 14, 'font-weight': 700, 'text-anchor': 'middle' });
+  for (let n = 1; n <= 4; n++) for (let l = 0; l < n; l++) {
+    const t = LS[l], x = MX[t], y = MY(n), idx = ORDER.findIndex(o => o.l === n + t);
+    let fillc = '#FFFFFF', stroke = '#C2CAD6', ink = 'var(--muted)', dash = '';
+    if (idx < 0) { fillc = '#F4F6F9'; dash = '3 3'; ink = '#A3ACBA'; }
+    else if (f[idx] === ORDER[idx].cap) { fillc = NSOFT(n); stroke = NCOL(n); ink = NCOL(n); }
+    else if (f[idx] > 0 || idx === ni) { stroke = 'var(--accent)'; ink = 'var(--ink)'; }
+    S('rect', { x: x - 20, y: y - 13, width: 40, height: 26, rx: 5, fill: fillc, stroke, 'stroke-width': idx === ni ? 2.5 : 1.5, 'stroke-dasharray': dash }, g);
+    T(g, x, y + 5, n + t, { class: 'svgt', 'font-size': 14, 'font-weight': 700, 'text-anchor': 'middle', fill: ink });
+  }
+  for (let sum = 1; sum <= 5; sum++) {
+    const cells = [];
+    for (let l = 3; l >= 0; l--) { const n = sum - l; if (n > l && n <= 4) cells.push([MX[LS[l]], MY(n)]); }
+    if (!cells.length) continue;
+    const [x1, y1] = cells[0], [x2, y2] = cells[cells.length - 1], ux = -48 / 60.4, uy = 34 / 60.4;
+    S('line', { x1: x1 - ux * 22, y1: y1 - uy * 22, x2: x2 + ux * 26, y2: y2 + uy * 26, stroke: '#E07A12', 'stroke-width': 1.6, opacity: .8, 'marker-end': 'url(#arr0)' }, g);
+    T(g, x1 - ux * 30, y1 - uy * 30 + 4, sum, { class: 'svgt', 'font-size': 11, 'font-weight': 700, fill: '#B65F07', 'text-anchor': 'middle' });
+  }
+  // electrones por capa
+  const sh = byShell(e);
+  T(g, 456, 252, 'Electrones por capa', { class: 'svgt', 'font-size': 14, 'font-weight': 700, 'text-anchor': 'middle' });
+  for (let n = 1; n <= 4; n++) {
+    const y = 250 + n * 34, c = sh[n - 1] || 0, last = sh.length === n;
+    if (last) S('rect', { x: 340, y: y - 15, width: 62, height: 22, rx: 11, fill: 'var(--accent-soft)', stroke: 'var(--accent)' }, g);
+    T(g, 371, y + 1, 'Capa ' + n, { class: 'svgt', 'font-size': 13, 'font-weight': 700, 'text-anchor': 'middle', fill: c ? NCOL(n) : '#A3ACBA' });
+    S('rect', { x: 410, y: y - 11, width: 150, height: 14, rx: 7, fill: '#EEF1F6' }, g);
+    if (c) S('rect', { x: 410, y: y - 11, width: Math.max(8, c / 18 * 150), height: 14, rx: 7, fill: NCOL(n) }, g);
+    T(g, 566, y + 1, String(c), { class: 'svgt', 'font-size': 14, 'font-weight': 700, fill: c ? 'var(--ink)' : '#A3ACBA' });
+  }
+  if (e) T(g, 456, 432, `Última capa: la ${sh.length}, con ${valenceCfg(e)} electrón${valenceCfg(e) === 1 ? '' : 'es'}`, { class: 'svgt', 'font-size': 14, 'font-weight': 700, 'text-anchor': 'middle', fill: 'var(--accent)' });
+  T(g, 456, 452, e ? 'Son los electrones de valencia.' : 'Todavía no hay electrones.', { class: 'svgt', 'font-size': 13, 'text-anchor': 'middle', fill: 'var(--muted)' });
+  panel0();
+  guideUpdate('configuracion');
+}
+function panel0() {
+  const e = s0.e, terms = cfgTerms(e), sym = e ? SYMZ[e - 1] : null;
+  $('#cfg0').innerHTML = e ? terms.map(t => `<span class="cn${t.n}">${t.l}<sup>${t.c}</sup></span>`).join('') : '<span class="cfg-empty">Todavía no hay electrones: la configuración aparecerá aquí.</span>';
+  let abbr = '';
+  const core = [36, 18, 10, 2].find(z => z < e);
+  if (core) abbr = `Forma abreviada: [${SYMZ[core - 1]}] ${strFromCounts(fill(e).map((c, i) => c - fill(core)[i]))}`;
+  if (e === 24) abbr += ' · En la realidad el cromo es una excepción: [Ar] 4s¹ 3d⁵.';
+  if (e === 29) abbr += ' · En la realidad el cobre es una excepción: [Ar] 4s¹ 3d¹⁰.';
+  $('#abbr0').textContent = abbr;
+  const sh = byShell(e);
+  $('#facts0').innerHTML = e
+    ? `<dt>Elemento</dt><dd>${EL[sym][2]} (${sym})</dd><dt>Protones (Z)</dt><dd>${e}</dd><dt>Electrones</dt><dd>${e} (átomo neutro)</dd>` +
+      `<dt>Capas</dt><dd>${sh.join(', ')}</dd><dt>De valencia</dt><dd>${valenceCfg(e)} (capa ${sh.length})</dd><dt>Acaba en</dt><dd>subnivel ${terms[terms.length - 1].t} (bloque ${terms[terms.length - 1].t})</dd>`
+    : '<dt>Electrones</dt><dd>0</dd>';
+  const last = terms[terms.length - 1];
+  const t = last || { n: 1, l: '1s', t: 's', c: 1 };
+  $('#read0').innerHTML = `<div class="anat"><span class="cn${t.n}">${t.n}</span><span>${t.t}</span><sup style="color:var(--accent)">${t.c}</sup></div>
+    <dl class="anat-list"><dt class="cn${t.n}">${t.n}</dt><dd>número de la <b>capa</b> (nivel de energía)</dd><dt>${t.t}</dt><dd><b>tipo de subnivel</b> (s, p, d o f)</dd><dt style="color:var(--accent)">${t.c}</dt><dd><b>electrones</b> en ese subnivel</dd></dl>
+    <p class="caps">${last ? 'Es el último término de la configuración de tu átomo.' : 'Ejemplo: el hidrógeno.'} Caben como máximo: s → 2 · p → 6 · d → 10 · f → 14.</p>`;
+  $$('#pt0 button').forEach(b => b.setAttribute('aria-pressed', +b.dataset.z === e ? 'true' : 'false'));
+  $('#rem0').disabled = e === 0; $('#add0').disabled = e >= 36;
+}
+function add0(idx) {
+  const e = s0.e, ni = nextIdx(e);
+  if (e >= 36) { setMsg('msg0', 'Este simulador llega hasta el kriptón, con 36 electrones.', 'warn'); return; }
+  if (idx === undefined) idx = ni;
+  if (idx !== ni) {
+    const o = ORDER[idx];
+    if (fill(e)[idx] === o.cap) setMsg('msg0', `El ${o.l} ya está lleno: en un subnivel ${o.t} caben como máximo ${o.cap} electrones.`, 'warn');
+    else setMsg('msg0', `Todavía no. Antes hay que llenar el ${ORDER[ni].l}, que tiene menos energía (está más abajo). Los electrones ocupan primero los subniveles más bajos.`, 'warn');
+    return;
+  }
+  s0.e++;
+  const o = ORDER[idx], sym = SYMZ[s0.e - 1];
+  if ([2, 10, 18, 36].includes(s0.e)) {
+    setMsg('msg0', `${EL[sym][2]}: ${cfgStr(s0.e)}. Todos sus subniveles ocupados están llenos: es un gas noble.`, 'ok');
+    celebrate(`¡${EL[sym][2]}: gas noble!`);
+  } else setMsg('msg0', `Electrón ${s0.e} en el ${o.l}. Ahora tienes el ${lname(sym)}: ${cfgStr(s0.e)}.`);
+  render0();
+}
+function set0(z) {
+  s0.e = z;
+  if (z) setMsg('msg0', `${EL[SYMZ[z - 1]][2]} (Z = ${z}): tiene ${z} electrones. ${cfgStr(z)}.`);
+  else setMsg('msg0', 'Toca el subnivel 1s, el más bajo del diagrama, para colocar el primer electrón.');
+  render0();
+}
+function buildPt0() {
+  const box = $('#pt0');
+  SYMZ.forEach(s => {
+    const z = EL[s][0];
+    const r = z <= 2 ? 1 : z <= 10 ? 2 : z <= 18 ? 3 : 4;
+    const c = z === 1 ? 1 : z === 2 ? 18 : r === 4 ? z - 18 : (z - (r === 2 ? 2 : 10) <= 2 ? z - (r === 2 ? 2 : 10) : z - (r === 2 ? 2 : 10) + 10);
+    const b = document.createElement('button');
+    b.type = 'button'; b.dataset.z = z; b.className = 'b-' + (z === 2 ? 's' : blockOf(z));
+    b.style.gridRow = r; b.style.gridColumn = c;
+    b.innerHTML = `<small>${z}</small>${s}`;
+    b.setAttribute('aria-label', `${EL[s][2]}, Z = ${z}`);
+    b.addEventListener('click', () => set0(z));
+    box.appendChild(b);
+  });
+}
+svg0.addEventListener('pointerdown', ev => {
+  const r = ev.target.closest('[data-row]');
+  if (r) { ev.preventDefault(); add0(+r.dataset.row); }
+});
+$('#add0').addEventListener('click', () => add0());
+$('#rem0').addEventListener('click', () => {
+  if (!s0.e) return;
+  const last = cfgTerms(s0.e).slice(-1)[0];
+  s0.e--;
+  setMsg('msg0', `Has quitado el último electrón, que estaba en el ${last.l}.`);
+  render0();
+});
+$('#reset0').addEventListener('click', () => set0(0));
+
+/* =====================================================================
+   2. OCTETO
+   ===================================================================== */
+const s1 = { sym: 'Na', e: 11, drag: null, names: true };
+const svg1 = $('#svg1');
+const R1 = [64, 104, 144, 184], C1 = { x: 330, y: 230 };
+
+function select1(s) {
+  s1.sym = s; s1.e = EL[s][0];
+  $$('#ptable button').forEach(x => x.setAttribute('aria-pressed', x.textContent === s ? 'true' : 'false'));
+  setMsg('msg1', `${EL[s][2]}: ${EL[s][0]} protones y ${EL[s][0]} electrones. Átomo neutro.`);
+  render1();
+}
+function buildPtable() {
+  const rows = [['H', 1, 1], ['He', 1, 8], ['Li', 2, 1], ['Be', 2, 2], ['B', 2, 3], ['C', 2, 4], ['N', 2, 5], ['O', 2, 6], ['F', 2, 7], ['Ne', 2, 8],
+    ['Na', 3, 1], ['Mg', 3, 2], ['Al', 3, 3], ['Si', 3, 4], ['P', 3, 5], ['S', 3, 6], ['Cl', 3, 7], ['Ar', 3, 8], ['K', 4, 1], ['Ca', 4, 2]];
+  const box = $('#ptable');
+  rows.forEach(([s, r, c]) => {
+    const b = document.createElement('button');
+    b.type = 'button'; b.textContent = s; b.className = 'k-' + EL[s][3];
+    b.style.gridRow = r; b.style.gridColumn = c;
+    b.setAttribute('aria-label', EL[s][2]);
+    b.setAttribute('aria-pressed', s === s1.sym ? 'true' : 'false');
+    b.addEventListener('click', () => select1(s));
+    box.appendChild(b);
+  });
+}
+function drawBucket(g, x, y) {
+  const grp = S('g', { 'data-drag': 'in', class: 'drag-e' }, g);
+  for (let i = 0; i < 7; i++) S('circle', { cx: x - 30 + i * 10, cy: y - 6 - (i % 2) * 6, r: 7.5, fill: 'var(--electron)', stroke: 'var(--electron-dark)' }, grp);
+  S('path', { d: `M ${x - 62} ${y} Q ${x - 56} ${y + 46} ${x} ${y + 46} Q ${x + 56} ${y + 46} ${x + 62} ${y} Z`, fill: 'url(#bowl)', stroke: '#173E8C', 'stroke-width': 2 }, grp);
+  S('ellipse', { cx: x, cy: y, rx: 62, ry: 9, fill: '#7FA9F5', stroke: '#173E8C', 'stroke-width': 2, opacity: .9 }, grp);
+  T(grp, x, y + 31, 'Electrones', { class: 'svgt', 'text-anchor': 'middle', fill: '#FFFFFF', 'font-weight': 700, 'font-size': 15 });
+}
+function render1() {
+  const g = $('#g1', svg1); g.innerHTML = '';
+  const [z, a, name] = EL[s1.sym];
+  const e = s1.e, sh = shells(e), nS = Math.max(shells(z).length, sh.length, 1);
+  const { x: cx, y: cy } = C1;
+  for (let i = 0; i < nS; i++) {
+    const outer = i === sh.length - 1;
+    S('circle', { cx, cy, r: R1[i], fill: 'none', stroke: outer ? 'var(--electron)' : '#9AA6B8', 'stroke-width': outer ? 2.5 : 1.5, 'stroke-dasharray': '6 6' }, g);
+  }
+  S('circle', { cx, cy, r: 36, fill: 'url(#nuc)', stroke: '#B5432C', 'stroke-width': 1.5 }, g);
+  T(g, cx, cy - 3, `${z} p⁺`, { class: 'svgt', 'text-anchor': 'middle', fill: '#FFFFFF', 'font-weight': 700, 'font-size': 15 });
+  T(g, cx, cy + 15, `${a - z} n`, { class: 'svgt', 'text-anchor': 'middle', fill: '#FFF2EC', 'font-size': 13 });
+  sh.forEach((k, i) => {
+    const outer = i === sh.length - 1;
+    for (let j = 0; j < k; j++) {
+      const ang = (-90 + j * 360 / k + i * 17) * Math.PI / 180;
+      const c = S('circle', { cx: cx + R1[i] * Math.cos(ang), cy: cy + R1[i] * Math.sin(ang), r: 8.5, fill: 'var(--electron)', stroke: 'var(--electron-dark)', 'stroke-width': 1 }, g);
+      if (outer) { c.setAttribute('data-drag', 'out'); c.setAttribute('class', 'drag-e'); }
+    }
+  });
+  if (s1.names) {
+    // nombres de las partes del átomo
+    for (let i = 0; i < sh.length; i++) {
+      const ang = 135 * Math.PI / 180, r = R1[i] + 14;
+      T(g, cx + r * Math.cos(ang), cy + r * Math.sin(ang) + 4, 'capa ' + (i + 1), { class: 'lbl', 'text-anchor': 'end', fill: i === sh.length - 1 ? 'var(--electron-dark)' : 'var(--muted)' });
+    }
+    if (sh.length) {
+      const ro = R1[sh.length - 1], lx = Math.min(cx + ro * 0.71 + 10, 440), n = sh[sh.length - 1];
+      T(g, lx, cy - ro * 0.71 - 18, 'última capa:', { class: 'lbl', fill: 'var(--electron-dark)' });
+      T(g, lx, cy - ro * 0.71 - 2, z === e ? `${n} electrón${n > 1 ? 'es' : ''} de valencia` : `${n} electrón${n > 1 ? 'es' : ''}`, { class: 'lbl', fill: 'var(--electron-dark)' });
+    }
+    S('line', { x1: cx + 30, y1: cy + 22, x2: 540, y2: 428, stroke: '#B5432C', 'stroke-width': 1.2, 'stroke-dasharray': '3 3' }, g);
+    T(g, 590, 446, 'núcleo: protones (+)', { class: 'lbl', 'text-anchor': 'end', fill: '#B5432C' });
+    T(g, 590, 463, 'y neutrones (sin carga)', { class: 'lbl', 'text-anchor': 'end', fill: '#B5432C' });
+  } else if (sh.length) {
+    const ro = R1[sh.length - 1];
+    T(g, cx + ro * 0.71 + 8, cy - ro * 0.71 - 8, 'última capa', { class: 'svgt', 'font-size': 14, fill: 'var(--electron-dark)', 'font-weight': 700 });
+  }
+  drawBucket(g, 92, 410);
+  const q = z - e;
+  T(g, 24, 54, s1.sym + sup(q), { class: 'svgt', 'font-family': 'Fredoka, sans-serif', 'font-size': 44, 'font-weight': 600 });
+  T(g, 26, 80, q === 0 ? name : `${q > 0 ? 'Catión' : 'Anión'} ${lname(s1.sym)}`, { class: 'svgt', 'font-size': 16, fill: 'var(--muted)' });
+  if (q !== 0) T(g, 26, 100, `${z} (+) y ${e} (−): carga ${plainCharge(q)}`, { class: 'svgt', 'font-size': 14, fill: q > 0 ? 'var(--proton)' : 'var(--electron-dark)', 'font-weight': 700 });
+  panel1();
+  guideUpdate('octeto');
+}
+function panel1() {
+  const [z, a] = EL[s1.sym];
+  const e = s1.e, sh = shells(e), q = z - e;
+  const last = sh.length ? sh[sh.length - 1] : 0;
+  $('#facts1').innerHTML =
+    `<dt>Protones</dt><dd>${z}</dd><dt>Neutrones</dt><dd>${a - z}</dd><dt>Electrones</dt><dd>${e}</dd>` +
+    `<dt>Carga</dt><dd>${q === 0 ? '0 (átomo neutro)' : (q > 0 ? '+' : '−') + Math.abs(q) + ' → ion ' + s1.sym + sup(q)}</dd>` +
+    `<dt>Capas</dt><dd>${sh.length ? sh.join(', ') : '—'}</dd><dt>Última capa</dt><dd>${last} electrones</dd>`;
+  const st = $('#status1');
+  if (e === 0) { st.className = 'status neutral'; st.textContent = 'Sin electrones: solo queda el núcleo (H⁺).'; }
+  else if (NOBLE[e]) { st.className = 'status ok'; st.textContent = `✓ Misma estructura que el ${NOBLE[e]} (${sh.join(', ')}): última capa completa.`; }
+  else { st.className = 'status warn'; st.textContent = `Su última capa tiene ${last} electrones: todavía no es la de un gas noble.`; }
+  $('#rem1').disabled = e <= Math.max(0, z - 3);
+  $('#add1').disabled = e >= z + 3;
+}
+function changeE1(d) {
+  const z = EL[s1.sym][0];
+  if (d < 0 && s1.e <= Math.max(0, z - 3)) { setMsg('msg1', 'En esta simulación los iones llegan como mucho a carga +3.', 'warn'); return; }
+  if (d > 0 && s1.e >= z + 3) { setMsg('msg1', 'En esta simulación los iones llegan como mucho a carga −3.', 'warn'); return; }
+  s1.e += d;
+  const q = z - s1.e;
+  if (NOBLE[s1.e]) {
+    setMsg('msg1', `¡Ahora tiene la misma estructura que el ${NOBLE[s1.e]}! Carga del ion: ${q === 0 ? '0' : plainCharge(q)}.`, 'ok');
+    if (q !== 0) celebrate(`¡Como el ${NOBLE[s1.e]}!`);
+  }
+  else setMsg('msg1', d < 0 ? `Has quitado un electrón. Ahora hay más protones que electrones: carga ${q === 0 ? '0' : plainCharge(q)}.` : `Has añadido un electrón. Carga: ${q === 0 ? '0' : plainCharge(q)}.`);
+  render1();
+}
+svg1.addEventListener('pointerdown', ev => {
+  const t = ev.target.closest('[data-drag]');
+  if (!t) return;
+  ev.preventDefault();
+  svg1.setPointerCapture(ev.pointerId);
+  const p = svgPt(svg1, ev);
+  const fl = S('circle', { cx: p.x, cy: p.y, r: 9.5, fill: 'var(--electron)', stroke: 'var(--electron-dark)', 'stroke-width': 1.5 }, $('#o1', svg1));
+  if (t.dataset.drag === 'out') t.setAttribute('opacity', '0.2');
+  s1.drag = { type: t.dataset.drag, el: fl };
+});
+svg1.addEventListener('pointermove', ev => {
+  if (!s1.drag) return;
+  const p = svgPt(svg1, ev);
+  s1.drag.el.setAttribute('cx', p.x); s1.drag.el.setAttribute('cy', p.y);
+});
+function end1(ev) {
+  if (!s1.drag) return;
+  const p = svgPt(svg1, ev);
+  const d = Math.hypot(p.x - C1.x, p.y - C1.y);
+  const sh = shells(s1.e), ro = R1[Math.max(0, sh.length - 1)];
+  const type = s1.drag.type;
+  s1.drag.el.remove(); s1.drag = null;
+  if (type === 'out' && d > ro + 30) changeE1(-1);
+  else if (type === 'in' && d < ro + 45) changeE1(+1);
+  else { if (type === 'out') setMsg('msg1', 'Para quitar el electrón, suéltalo lejos del átomo.'); else setMsg('msg1', 'Para añadirlo, suelta el electrón sobre el átomo.'); render1(); }
+}
+svg1.addEventListener('pointerup', end1);
+svg1.addEventListener('pointercancel', () => { if (s1.drag) { s1.drag.el.remove(); s1.drag = null; render1(); } });
+$('#rem1').addEventListener('click', () => changeE1(-1));
+$('#add1').addEventListener('click', () => changeE1(+1));
+$('#names1').addEventListener('change', e => { s1.names = e.target.checked; render1(); });
+$('#reset1').addEventListener('click', () => select1('Na'));
+
+/* =====================================================================
+   3. ENLACE IÓNICO
+   ===================================================================== */
+const METALS = ['Li', 'Na', 'K', 'Mg', 'Ca', 'Al'], NONMETALS = ['F', 'Cl', 'O', 'S', 'N'];
+const MET_NAME = { Li: 'litio', Na: 'sodio', K: 'potasio', Mg: 'magnesio', Ca: 'calcio', Al: 'aluminio' };
+const AN_NAME = { F: 'fluoruro', Cl: 'cloruro', O: 'óxido', S: 'sulfuro', N: 'nitruro' };
+const s2 = { metal: 'K', nonmetal: 'F', nm: 1, nn: 1, atoms: [], sel: null, drag: null, tap: null, done: false, moves: 0 };
+const svg2 = $('#svg2');
+const stable2 = a => a.isMetal ? a.e === 0 : a.e === 8;
+const nm2 = a => lname(a.sym);
+function layoutY(n) { return n === 1 ? [225] : n === 2 ? [150, 300] : [90, 225, 360]; }
+function build2() {
+  s2.atoms = []; s2.done = false; s2.sel = null; s2.moves = 0;
+  layoutY(s2.nm).forEach((y, i) => s2.atoms.push(mkAtom2('m' + i, s2.metal, true, 160, y)));
+  layoutY(s2.nn).forEach((y, i) => s2.atoms.push(mkAtom2('x' + i, s2.nonmetal, false, 440, y)));
+  $('#nm-out').textContent = s2.nm; $('#nn-out').textContent = s2.nn;
+  render2();
+}
+function setIonic(m, x, nm, nn) {
+  s2.metal = m; s2.nonmetal = x; s2.nm = nm; s2.nn = nn;
+  chips2(); build2();
+  setMsg('msg2', `${EL[m][2]} y ${lname(x)}: ${valence(EL[m][0])} electrón${valence(EL[m][0]) > 1 ? 'es' : ''} de valencia frente a ${valence(EL[x][0])}.`);
+}
+function mkAtom2(id, sym, isMetal, x, y) { const v = valence(EL[sym][0]); return { id, sym, isMetal, v0: v, e: v, x, y }; }
+const find2 = id => s2.atoms.find(a => a.id === id);
+function dotPositions(n, cx, cy, r) {
+  // reparto de Lewis: un electrón en cada lado y después se emparejan
+  const out = [], card = [-90, 0, 90, 180];
+  for (let j = 0; j < 4; j++) {
+    const c = n <= 4 ? (j < n ? 1 : 0) : 1 + (j < n - 4 ? 1 : 0);
+    const offs = c === 1 ? [0] : c === 2 ? [-13, 13] : [];
+    offs.forEach(o => { const a = (card[j] + o) * Math.PI / 180; out.push([cx + r * Math.cos(a), cy + r * Math.sin(a)]); });
+  }
+  return out;
+}
+function drawIonAtom(g, a) {
+  const grp = S('g', { 'data-atom': a.id, style: 'cursor:pointer' }, g);
+  const st = stable2(a);
+  if (s2.sel === a.id) S('circle', { cx: a.x, cy: a.y, r: 66, fill: 'none', stroke: 'var(--accent)', 'stroke-width': 3, 'stroke-dasharray': '6 5' }, grp);
+  S('circle', { cx: a.x, cy: a.y, r: 52, fill: st ? 'var(--ok-soft)' : 'rgba(47,111,224,0.05)', stroke: st ? 'var(--ok)' : '#8EA2C4', 'stroke-width': st ? 3 : 1.5, 'stroke-dasharray': st ? '' : '6 5' }, grp);
+  S('circle', { cx: a.x, cy: a.y, r: 30, fill: a.isMetal ? 'var(--metal)' : 'var(--nonmetal)', stroke: a.isMetal ? 'var(--metal-edge)' : 'var(--nonmetal-edge)', 'stroke-width': 2 }, grp);
+  T(grp, a.x, a.y + 8, a.sym, { class: 'atom-sym svgt' });
+  if (a.isMetal && a.e === 0) {
+    const core = EL[a.sym][0] <= 4 ? 2 : 8;
+    dotPositions(core, a.x, a.y, 52).forEach(([x, y]) => S('circle', { cx: x, cy: y, r: 6, fill: '#9FB0C8', stroke: '#6D7C92' }, grp));
+    T(grp, a.x, a.y + 76, 'capa anterior completa', { class: 'small-t svgt', fill: 'var(--ok)', 'font-weight': 700 });
+  } else {
+    dotPositions(a.e, a.x, a.y, 52).forEach(([x, y]) => S('circle', { cx: x, cy: y, r: 7.5, fill: 'var(--electron)', stroke: 'var(--electron-dark)', 'data-drag': 'e', class: 'drag-e' }, grp));
+    if (!a.isMetal && a.e === 8) T(grp, a.x, a.y + 76, 'capa completa', { class: 'small-t svgt', fill: 'var(--ok)', 'font-weight': 700 });
+    else if (!s2.done) T(grp, a.x, a.y + 76, `${a.e} de valencia`, { class: 'small-t svgt' });
+  }
+  const q = a.v0 - a.e;
+  if (q) {
+    S('circle', { cx: a.x + 44, cy: a.y - 44, r: 17, fill: q > 0 ? 'var(--proton)' : 'var(--electron)' }, grp);
+    T(grp, a.x + 44, a.y - 38, plainCharge(q), { class: 'badge-t svgt' });
+  }
+}
+function render2() {
+  const g = $('#g2', svg2); g.innerHTML = '';
+  if (!s2.done) {
+    T(g, 160, 30, 'Metal: cede electrones', { class: 'small-t svgt', 'font-weight': 700 });
+    T(g, 440, 30, 'No metal: gana electrones', { class: 'small-t svgt', 'font-weight': 700 });
+  }
+  if (s2.done) drawAttraction(g);
+  s2.atoms.forEach(a => drawIonAtom(g, a));
+  if (s2.done) {
+    const f = formula2();
+    S('rect', { x: 120, y: 14, width: 360, height: 44, rx: 10, fill: 'var(--ok-soft)', stroke: 'var(--ok)' }, g);
+    T(g, 300, 44, `¡${f.formula}! Los iones se atraen.`, { class: 'svgt', 'text-anchor': 'middle', 'font-size': 20, 'font-weight': 700, fill: 'var(--ok-ink)' });
+  }
+  panel2();
+  guideUpdate('ionico');
+}
+function drawAttraction(g) {
+  const ms = s2.atoms.filter(a => a.isMetal), xs = s2.atoms.filter(a => !a.isMetal);
+  ms.forEach(m => xs.forEach(x => {
+    if (Math.hypot(m.x - x.x, m.y - x.y) < 170) S('line', { x1: m.x, y1: m.y, x2: x.x, y2: x.y, stroke: '#E0A33A', 'stroke-width': 4, 'stroke-dasharray': '2 7', 'stroke-linecap': 'round' }, g);
+  }));
+}
+function formula2() {
+  const m = s2.atoms.filter(a => a.isMetal).length, n = s2.atoms.filter(a => !a.isMetal).length, k = gcd(m, n);
+  const qm = valence(EL[s2.metal][0]), qn = 8 - valence(EL[s2.nonmetal][0]);
+  return {
+    formula: s2.metal + sub(m / k) + s2.nonmetal + sub(n / k),
+    name: `${AN_NAME[s2.nonmetal]} de ${MET_NAME[s2.metal]}`,
+    ions: `${m > 1 ? m + ' ' : ''}${s2.metal}${sup(qm)} y ${n > 1 ? n + ' ' : ''}${s2.nonmetal}${sup(-qn)}`
+  };
+}
+function panel2() {
+  const box = $('#state2');
+  const metalsLeft = s2.atoms.filter(a => a.isMetal).reduce((s, a) => s + a.e, 0);
+  const need = s2.atoms.filter(a => !a.isMetal).reduce((s, a) => s + Math.max(0, 8 - a.e), 0);
+  if (s2.done) {
+    const f = formula2();
+    box.innerHTML = `<div class="success"><div class="big">${f.formula}</div><p><b>${f.name[0].toUpperCase() + f.name.slice(1)}</b></p>
+      <p>Iones: ${f.ions}. Las cargas se compensan y el compuesto es neutro.</p>
+      <p>En un cristal real hay millones de iones ordenados en una red:</p>
+      ${crystalSvg()}</div>`;
+    return;
+  }
+  let msg;
+  if (s2.moves === 0) msg = `El metal tiene ${metalsLeft} electrón${metalsLeft === 1 ? '' : 'es'} para dar y al no metal le falta${need === 1 ? '' : 'n'} ${need}.`;
+  else if (metalsLeft === 0 && need > 0) msg = `Los átomos de metal ya no tienen electrones que dar, pero aún faltan ${need}. Añade otro átomo de ${MET_NAME[s2.metal]}.`;
+  else if (need === 0 && metalsLeft > 0) msg = `Los no metales ya tienen 8 electrones y al metal le sobran ${metalsLeft}. Añade otro átomo de ${lname(s2.nonmetal)}.`;
+  else msg = `Quedan ${metalsLeft} electrón${metalsLeft === 1 ? '' : 'es'} por dar y falta${need === 1 ? '' : 'n'} ${need} para completar las capas.`;
+  box.innerHTML = `<div class="status neutral">${msg}</div>`;
+}
+function crystalSvg() {
+  let s = '<svg viewBox="0 0 240 110" style="width:100%;height:auto;margin-top:6px" aria-label="Red cristalina de iones">';
+  for (let r = 0; r < 4; r++) for (let c = 0; c < 9; c++) {
+    const pos = (r + c) % 2 === 0, x = 18 + c * 25.5, y = 16 + r * 26;
+    s += pos ? `<circle cx="${x}" cy="${y}" r="8" fill="#AEBBCD" stroke="#6D7C92"/><text x="${x}" y="${y + 4}" text-anchor="middle" font-size="11" font-weight="700" fill="#1C2333">+</text>`
+             : `<circle cx="${x}" cy="${y}" r="11" fill="#8ED6A6" stroke="#4E9C6B"/><text x="${x}" y="${y + 4}" text-anchor="middle" font-size="12" font-weight="700" fill="#1C2333">−</text>`;
+  }
+  return s + '</svg>';
+}
+function transfer2(fromId, toId) {
+  const A = find2(fromId), B = find2(toId);
+  if (!A || !B || A === B) return;
+  if (A.e === 0) { setMsg('msg2', `Al ${nm2(A)} no le quedan electrones en su última capa.`, 'warn'); return; }
+  if (B.e >= 8) { setMsg('msg2', `La última capa del ${nm2(B)} ya está completa: no le cabe otro electrón.`, 'warn'); return; }
+  A.e--; B.e++; s2.moves++;
+  if (!A.isMetal && B.isMetal) setMsg('msg2', `El ${nm2(A)} es un no metal: le cuesta mucho perder electrones. Lo habitual es al revés, el metal cede y el no metal gana.`, 'warn');
+  else if (A.isMetal === B.isMetal) setMsg('msg2', 'Los dos átomos son del mismo tipo: así no se forma un enlace iónico.', 'warn');
+  else setMsg('msg2', `El ${nm2(A)} cede un electrón al ${nm2(B)}. El que pierde queda positivo y el que gana, negativo.`);
+  if (s2.atoms.every(stable2)) success2();
+  else render2();
+}
+function success2() {
+  s2.done = true; s2.sel = null;
+  const ms = s2.atoms.filter(a => a.isMetal), xs = s2.atoms.filter(a => !a.isMetal);
+  const targets = new Map();
+  const cx = 300, cy = 255;
+  if (ms.length === 1 || xs.length === 1) {
+    const [one, many] = ms.length === 1 ? [ms[0], xs] : [xs[0], ms];
+    if (many.length === 1) { targets.set(one.id, [cx - 64, cy]); targets.set(many[0].id, [cx + 64, cy]); }
+    else { targets.set(one.id, [cx, cy]); many.forEach((a, i) => { const ang = (-90 + i * 360 / many.length) * Math.PI / 180; targets.set(a.id, [cx + 128 * Math.cos(ang), cy + 128 * Math.sin(ang)]); }); }
+  } else {
+    // alternancia en fila: + − + − + ...
+    const big = ms.length >= xs.length ? ms : xs, small = big === ms ? xs : ms, seq = [];
+    for (let i = 0; i < big.length; i++) { seq.push(big[i]); if (small[i]) seq.push(small[i]); }
+    const sp = Math.min(128, 520 / (seq.length - 1 || 1));
+    seq.forEach((a, i) => targets.set(a.id, [cx - sp * (seq.length - 1) / 2 + i * sp, cy]));
+  }
+  const start = s2.atoms.map(a => [a.x, a.y]);
+  const dur = RM ? 0 : 750, t0 = performance.now();
+  const f = formula2();
+  setMsg('msg2', `¡Compuesto iónico formado: ${f.formula} (${f.name})! Los iones ${f.ions} se atraen porque tienen cargas opuestas.`, 'ok');
+  celebrate(`¡${f.formula} formado!`);
+  const step = now => {
+    const k = dur ? Math.min(1, (now - t0) / dur) : 1, e = 1 - Math.pow(1 - k, 3);
+    s2.atoms.forEach((a, i) => { const [tx, ty] = targets.get(a.id); a.x = start[i][0] + (tx - start[i][0]) * e; a.y = start[i][1] + (ty - start[i][1]) * e; });
+    render2();
+    if (k < 1) requestAnimationFrame(step);
+  };
+  requestAnimationFrame(step);
+}
+svg2.addEventListener('pointerdown', ev => {
+  if (s2.done) return;
+  const grp = ev.target.closest('[data-atom]');
+  if (!grp) { s2.sel = null; render2(); return; }
+  ev.preventDefault();
+  svg2.setPointerCapture(ev.pointerId);
+  const p = svgPt(svg2, ev);
+  if (ev.target.dataset.drag === 'e') {
+    ev.target.setAttribute('opacity', '0.2');
+    s2.drag = { from: grp.dataset.atom, el: S('circle', { cx: p.x, cy: p.y, r: 8.5, fill: 'var(--electron)', stroke: 'var(--electron-dark)', 'stroke-width': 1.5 }, $('#o2', svg2)), x0: p.x, y0: p.y };
+  } else s2.tap = { id: grp.dataset.atom, x0: p.x, y0: p.y };
+});
+svg2.addEventListener('pointermove', ev => {
+  if (!s2.drag) return;
+  const p = svgPt(svg2, ev);
+  s2.drag.el.setAttribute('cx', p.x); s2.drag.el.setAttribute('cy', p.y);
+});
+svg2.addEventListener('pointerup', ev => {
+  const p = svgPt(svg2, ev);
+  if (s2.drag) {
+    const d = s2.drag; d.el.remove(); s2.drag = null;
+    if (Math.hypot(p.x - d.x0, p.y - d.y0) < 8) { tap2(d.from); return; }
+    const target = s2.atoms.find(a => a.id !== d.from && Math.hypot(a.x - p.x, a.y - p.y) < 66);
+    if (target) transfer2(d.from, target.id);
+    else { setMsg('msg2', 'Suelta el electrón encima de otro átomo.'); render2(); }
+  } else if (s2.tap) {
+    const t = s2.tap; s2.tap = null;
+    if (Math.hypot(p.x - t.x0, p.y - t.y0) < 10) tap2(t.id);
+  }
+});
+svg2.addEventListener('pointercancel', () => { if (s2.drag) { s2.drag.el.remove(); s2.drag = null; } s2.tap = null; render2(); });
+function tap2(id) {
+  if (s2.done) return;
+  if (!s2.sel) { s2.sel = id; setMsg('msg2', `Has elegido el ${nm2(find2(id))}. Ahora toca el átomo que recibirá un electrón.`); render2(); return; }
+  if (s2.sel === id) { s2.sel = null; setMsg('msg2', 'Selección quitada.'); render2(); return; }
+  const from = s2.sel;
+  transfer2(from, id);
+  if (!s2.done && find2(from) && find2(from).e === 0) s2.sel = null;
+  if (!s2.done) render2();
+}
+function chips2() {
+  const mk = (box, list, key, label) => {
+    box.innerHTML = '';
+    list.forEach(s => {
+      const b = document.createElement('button');
+      b.type = 'button'; b.className = 'btn small'; b.textContent = s; b.title = EL[s][2];
+      b.setAttribute('aria-label', EL[s][2]);
+      b.setAttribute('aria-pressed', s2[key] === s ? 'true' : 'false');
+      b.addEventListener('click', () => { s2[key] = s; chips2(); build2(); setMsg('msg2', `${label}: ${EL[s][2]}. ¿Quién debería dar electrones a quién?`); });
+      box.appendChild(b);
+    });
+  };
+  mk($('#metals'), METALS, 'metal', 'Metal');
+  mk($('#nonmetals'), NONMETALS, 'nonmetal', 'No metal');
+}
+$$('[data-step]').forEach(b => b.addEventListener('click', () => {
+  const k = b.dataset.step, d = +b.dataset.d;
+  s2[k] = Math.min(3, Math.max(1, s2[k] + d));
+  build2();
+  setMsg('msg2', 'Has cambiado el número de átomos. Todos empiezan con sus electrones de valencia.');
+}));
+$('#reset2').addEventListener('click', () => { build2(); setMsg('msg2', 'Los electrones han vuelto a sus átomos.'); });
+
+/* =====================================================================
+   4. ENLACE COVALENTE
+   ===================================================================== */
+// colores habituales de los modelos moleculares (CPK)
+const COV = {
+  H: { v: 1, max: 1, col: '#F2F4F7', edge: '#8C95A6', ink: '#1C2333', r: 21 },
+  C: { v: 4, max: 4, col: '#3B4048', edge: '#1D2026', ink: '#FFFFFF', r: 27 },
+  N: { v: 5, max: 3, col: '#3E6FD8', edge: '#244EA8', ink: '#FFFFFF', r: 27 },
+  O: { v: 6, max: 2, col: '#DE4B3A', edge: '#A82F21', ink: '#FFFFFF', r: 27 },
+  S: { v: 6, max: 2, col: '#E8C030', edge: '#A88710', ink: '#1C2333', r: 29 },
+  F: { v: 7, max: 1, col: '#9EDB8F', edge: '#5FA352', ink: '#16462A', r: 25 },
+  Cl: { v: 7, max: 1, col: '#4FAE55', edge: '#327F38', ink: '#FFFFFF', r: 28 }
+};
+const KNOWN = [
+  [{ H: 2 }, 'H₂', 'hidrógeno'], [{ O: 2 }, 'O₂', 'oxígeno'], [{ N: 2 }, 'N₂', 'nitrógeno'], [{ F: 2 }, 'F₂', 'flúor'], [{ Cl: 2 }, 'Cl₂', 'cloro'],
+  [{ H: 1, Cl: 1 }, 'HCl', 'cloruro de hidrógeno'], [{ H: 1, F: 1 }, 'HF', 'fluoruro de hidrógeno'], [{ H: 2, O: 1 }, 'H₂O', 'agua'],
+  [{ H: 2, S: 1 }, 'H₂S', 'sulfuro de hidrógeno'], [{ H: 3, N: 1 }, 'NH₃', 'amoniaco'], [{ C: 1, H: 4 }, 'CH₄', 'metano'],
+  [{ C: 1, O: 2 }, 'CO₂', 'dióxido de carbono'], [{ C: 1, Cl: 4 }, 'CCl₄', 'tetracloruro de carbono'], [{ N: 1, Cl: 3 }, 'NCl₃', 'tricloruro de nitrógeno'],
+  [{ C: 2, H: 6 }, 'C₂H₆', 'etano'], [{ C: 2, H: 4 }, 'C₂H₄', 'eteno'], [{ C: 2, H: 2 }, 'C₂H₂', 'etino'], [{ H: 2, O: 2 }, 'H₂O₂', 'peróxido de hidrógeno'],
+  [{ C: 1, H: 2, O: 1 }, 'CH₂O', 'metanal'], [{ C: 1, H: 4, O: 1 }, 'CH₃OH', 'metanol'], [{ C: 1, H: 1, N: 1 }, 'HCN', 'cianuro de hidrógeno'],
+  [{ O: 1, F: 2 }, 'OF₂', 'difluoruro de oxígeno'], [{ C: 1, S: 2 }, 'CS₂', 'disulfuro de carbono'], [{ H: 1, Cl: 1, O: 1 }, 'HClO', 'ácido hipocloroso']
+];
+const keyOf = c => Object.keys(c).sort().map(k => k + c[k]).join('');
+const KNOWN_MAP = new Map(KNOWN.map(([c, f, n]) => [keyOf(c), { f, n }]));
+const TARGETS3 = [['F₂', { F: 2 }], ['NCl₃', { N: 1, Cl: 3 }], ['N₂', { N: 2 }], ['CO₂', { C: 1, O: 2 }], ['CCl₄', { C: 1, Cl: 4 }], ['CS₂', { C: 1, S: 2 }], ['C₂H₄', { C: 2, H: 4 }], ['HCN', { C: 1, H: 1, N: 1 }]];
+const s3 = { atoms: [], bonds: [], sel: null, drag: null, next: 1, dots: true, built: new Set() };
+const svg3 = $('#svg3');
+const atom3 = id => s3.atoms.find(a => a.id === id);
+const used3 = a => s3.bonds.reduce((s, b) => s + (b.a === a.id || b.b === a.id ? b.o : 0), 0);
+const free3 = a => COV[a.sym].max - used3(a);
+const name3 = a => lname(a.sym);
+function addAtom3(sym) {
+  if (s3.atoms.length >= 10) { setMsg('msg3', 'Como máximo puedes tener 10 átomos en la mesa.', 'warn'); return; }
+  let best = null, bestD = -1;
+  for (let x = 80; x <= 520; x += 55) for (let y = 70; y <= 400; y += 55) {
+    const d = s3.atoms.reduce((m, a) => Math.min(m, Math.hypot(a.x - x, a.y - y)), 999) - Math.hypot(x - 300, y - 235) * 0.15;
+    if (d > bestD) { bestD = d; best = [x, y]; }
+  }
+  s3.atoms.push({ id: s3.next++, sym, x: best[0], y: best[1] });
+  const c = COV[sym];
+  setMsg('msg3', `Has añadido un átomo de ${lname(sym)}. Tiene ${c.v} electrón${c.v > 1 ? 'es' : ''} de valencia; le falta${c.max > 1 ? 'n' : ''} ${c.max} para completar su capa, así que puede compartir ${c.max} electrón${c.max > 1 ? 'es' : ''} (los que brillan).`);
+  render3();
+}
+function clear3() { s3.atoms = []; s3.bonds = []; s3.sel = null; s3.built.clear(); render3(); }
+function lone3(a) {
+  const nb = s3.bonds.filter(b => b.a === a.id || b.b === a.id).map(b => atom3(b.a === a.id ? b.b : b.a));
+  const angs = nb.map(o => Math.atan2(o.y - a.y, o.x - a.x));
+  const base = angs.length ? angs[0] : -Math.PI / 2;
+  const slots = [0, 1, 2, 3].map(k => base + k * Math.PI / 2), occ = new Set();
+  angs.forEach(t => {
+    let bi = -1, bd = 9;
+    slots.forEach((s, i) => { if (occ.has(i)) return; const d = Math.abs(Math.atan2(Math.sin(t - s), Math.cos(t - s))); if (d < bd) { bd = d; bi = i; } });
+    if (bi >= 0) occ.add(bi);
+  });
+  const freeSlots = slots.filter((s, i) => !occ.has(i));
+  const c = COV[a.sym], nbE = c.v - used3(a), singles = free3(a), pairs = Math.max(0, (nbE - singles) / 2);
+  const out = [];
+  let k = 0;
+  for (let i = 0; i < pairs && k < freeSlots.length; i++, k++) out.push({ ang: freeSlots[k], n: 2 });
+  for (let i = 0; i < singles && k < freeSlots.length; i++, k++) out.push({ ang: freeSlots[k], n: 1 });
+  return out;
+}
+function render3() {
+  const g = $('#g3', svg3); g.innerHTML = '';
+  if (!s3.atoms.length) T(g, 300, 235, 'Añade átomos con los botones de la derecha', { class: 'small-t svgt', 'font-size': 17 });
+  s3.bonds.forEach((b, i) => {
+    const A = atom3(b.a), B = atom3(b.b);
+    const dx = B.x - A.x, dy = B.y - A.y, L = Math.hypot(dx, dy) || 1, ux = dx / L, uy = dy / L, nx = -uy, ny = ux;
+    const ra = COV[A.sym].r, rb = COV[B.sym].r;
+    const bg = S('g', { 'data-bond': i, style: 'cursor:pointer' }, g);
+    S('line', { x1: A.x, y1: A.y, x2: B.x, y2: B.y, stroke: 'transparent', 'stroke-width': 24 + 8 * (b.o - 1) }, bg);
+    for (let k = 0; k < b.o; k++) {
+      const off = (k - (b.o - 1) / 2) * 10;
+      S('line', { x1: A.x + ux * ra + nx * off, y1: A.y + uy * ra + ny * off, x2: B.x - ux * rb + nx * off, y2: B.y - uy * rb + ny * off, stroke: '#3B4252', 'stroke-width': 3.5, 'stroke-linecap': 'round' }, bg);
+      if (s3.dots) {
+        const mx = (A.x + ux * ra + B.x - ux * rb) / 2 + nx * off, my = (A.y + uy * ra + B.y - uy * rb) / 2 + ny * off;
+        S('circle', { cx: mx - ux * 6.5, cy: my - uy * 6.5, r: 4.6, fill: 'var(--electron)', stroke: COV[A.sym].edge, 'stroke-width': 2 }, bg);
+        S('circle', { cx: mx + ux * 6.5, cy: my + uy * 6.5, r: 4.6, fill: 'var(--electron)', stroke: COV[B.sym].edge, 'stroke-width': 2 }, bg);
+      }
+    }
+  });
+  s3.atoms.forEach(a => {
+    const c = COV[a.sym], done = free3(a) === 0;
+    const grp = S('g', { 'data-atom': a.id, style: 'cursor:grab' }, g);
+    if (s3.sel === a.id) S('circle', { cx: a.x, cy: a.y, r: c.r + 22, fill: 'none', stroke: 'var(--accent)', 'stroke-width': 3, 'stroke-dasharray': '6 5' }, grp);
+    if (done) S('circle', { cx: a.x, cy: a.y, r: c.r + 6, fill: 'none', stroke: 'var(--ok)', 'stroke-width': 3 }, grp);
+    S('circle', { cx: a.x, cy: a.y, r: c.r, fill: c.col, stroke: c.edge, 'stroke-width': 2 }, grp);
+    T(grp, a.x, a.y + 7, a.sym, { class: 'atom-sym svgt', fill: c.ink, 'font-size': a.sym.length > 1 ? 19 : 21 });
+    lone3(a).forEach(({ ang, n }) => {
+      const rr = c.r + 11, spread = n === 2 ? [-0.27, 0.27] : [0];
+      spread.forEach(o => {
+        const x = a.x + rr * Math.cos(ang + o), y = a.y + rr * Math.sin(ang + o);
+        if (n === 1) S('circle', { cx: x, cy: y, r: 8.5, fill: 'rgba(47,111,224,0.16)', stroke: 'none' }, grp);
+        S('circle', { cx: x, cy: y, r: 4.6, fill: 'var(--electron)', stroke: 'var(--electron-dark)', 'stroke-width': 1 }, grp);
+      });
+    });
+  });
+  panel3();
+  guideUpdate('covalente');
+}
+function components3() {
+  const seen = new Set(), comps = [];
+  s3.atoms.forEach(a => {
+    if (seen.has(a.id)) return;
+    const comp = [], stack = [a.id];
+    seen.add(a.id);
+    while (stack.length) {
+      const id = stack.pop(); comp.push(atom3(id));
+      s3.bonds.forEach(b => { const o = b.a === id ? b.b : b.b === id ? b.a : null; if (o !== null && !seen.has(o)) { seen.add(o); stack.push(o); } });
+    }
+    comps.push(comp);
+  });
+  return comps;
+}
+function formulaOf(counts) {
+  const k = KNOWN_MAP.get(keyOf(counts));
+  if (k) return k;
+  const order = counts.C ? ['C', 'H', ...Object.keys(counts).filter(x => x !== 'C' && x !== 'H').sort()] : Object.keys(counts).sort();
+  return { f: order.filter(x => counts[x]).map(x => x + sub(counts[x])).join(''), n: null };
+}
+function panel3() {
+  const comps = components3(), box = $('#mols3');
+  if (!comps.length) { box.innerHTML = '<p>Todavía no hay átomos en la mesa.</p>'; }
+  else box.innerHTML = comps.map(comp => {
+    const counts = {}; comp.forEach(a => { counts[a.sym] = (counts[a.sym] || 0) + 1; });
+    const f = formulaOf(counts);
+    const lacking = comp.filter(a => free3(a) > 0);
+    if (comp.length > 1 && !lacking.length) {
+      s3.built.add(keyOf(counts));
+      return `<div class="mol ok"><strong>${f.f}</strong>${f.n ? ' · ' + f.n : ''}<br>✓ Molécula estable: todos los átomos tienen la última capa completa.</div>`;
+    }
+    const det = lacking.map(a => `al ${name3(a)} le falta${free3(a) > 1 ? 'n' : ''} ${free3(a)}`).join(', ');
+    return `<div class="mol"><strong>${f.f}</strong>${comp.length === 1 ? ' (átomo suelto)' : ''}<br>Incompleta: ${det} electrón${lacking.length === 1 && free3(lacking[0]) === 1 ? '' : 'es'} por compartir.</div>`;
+  }).join('');
+  $('#check3').innerHTML = TARGETS3.map(([f, c]) => `<li class="${s3.built.has(keyOf(c)) ? 'done' : ''}">${f}</li>`).join('');
+}
+function bond3(aId, bId) {
+  const A = atom3(aId), B = atom3(bId);
+  if (free3(A) < 1) { setMsg('msg3', `El ${name3(A)} ya ha completado su capa: no le quedan electrones sin pareja para compartir.`, 'warn'); return; }
+  if (free3(B) < 1) { setMsg('msg3', `El ${name3(B)} ya ha completado su capa: no le quedan electrones sin pareja para compartir.`, 'warn'); return; }
+  let b = s3.bonds.find(x => (x.a === aId && x.b === bId) || (x.a === bId && x.b === aId));
+  if (b && b.o >= 3) { setMsg('msg3', 'Dos átomos comparten como mucho tres pares de electrones (enlace triple).', 'warn'); return; }
+  if (!b) { b = { a: aId, b: bId, o: 0 }; s3.bonds.push(b); }
+  b.o++;
+  const L = Math.hypot(B.x - A.x, B.y - A.y), want = COV[A.sym].r + COV[B.sym].r + 44;
+  if (L > want + 30 && s3.bonds.filter(x => x.a === bId || x.b === bId).length === 1) {
+    const ux = (B.x - A.x) / L, uy = (B.y - A.y) / L;
+    B.x = Math.min(570, Math.max(30, A.x + ux * want)); B.y = Math.min(440, Math.max(30, A.y + uy * want));
+  }
+  const kind = ['', 'simple', 'doble', 'triple'][b.o], pairs = ['', 'un par', 'dos pares', 'tres pares'][b.o];
+  setMsg('msg3', `El ${name3(A)} y el ${name3(B)} comparten ${pairs} de electrones: enlace ${kind}. Cada átomo aporta un electrón a cada par.`);
+  const comps = components3(), comp = comps.find(c => c.includes(A));
+  if (comp && comp.length > 1 && comp.every(a => free3(a) === 0)) {
+    const counts = {}; comp.forEach(a => { counts[a.sym] = (counts[a.sym] || 0) + 1; });
+    const f = formulaOf(counts);
+    setMsg('msg3', `¡Molécula estable: ${f.f}${f.n ? ' (' + f.n + ')' : ''}! Todos los átomos tienen la última capa completa.`, 'ok');
+    celebrate(`¡${f.f} estable!`);
+  }
+}
+svg3.addEventListener('pointerdown', ev => {
+  const bg = ev.target.closest('[data-bond]');
+  if (bg) {
+    const b = s3.bonds[+bg.dataset.bond];
+    b.o--;
+    if (b.o === 0) s3.bonds.splice(+bg.dataset.bond, 1);
+    setMsg('msg3', 'Has deshecho un par compartido: cada átomo recupera su electrón.');
+    render3(); return;
+  }
+  const grp = ev.target.closest('[data-atom]');
+  if (!grp) { s3.sel = null; render3(); return; }
+  ev.preventDefault();
+  svg3.setPointerCapture(ev.pointerId);
+  const p = svgPt(svg3, ev), a = atom3(+grp.dataset.atom);
+  s3.drag = { id: a.id, ox: p.x - a.x, oy: p.y - a.y, x0: p.x, y0: p.y, moved: false };
+});
+svg3.addEventListener('pointermove', ev => {
+  if (!s3.drag) return;
+  const p = svgPt(svg3, ev), d = s3.drag;
+  if (!d.moved && Math.hypot(p.x - d.x0, p.y - d.y0) > 7) d.moved = true;
+  if (d.moved) { const a = atom3(d.id); a.x = Math.min(570, Math.max(30, p.x - d.ox)); a.y = Math.min(440, Math.max(30, p.y - d.oy)); render3(); }
+});
+svg3.addEventListener('pointerup', () => {
+  const d = s3.drag; s3.drag = null;
+  if (!d || d.moved) return;
+  if (s3.sel === null) {
+    const a = atom3(d.id);
+    s3.sel = d.id;
+    setMsg('msg3', free3(a) > 0 ? `Has elegido el ${name3(a)}. Toca otro átomo para compartir un par de electrones.` : `El ${name3(a)} ya tiene la capa completa. Puedes moverlo o quitarlo.`);
+  } else if (s3.sel === d.id) { s3.sel = null; setMsg('msg3', 'Selección quitada.'); }
+  else { bond3(s3.sel, d.id); s3.sel = null; }
+  render3();
+});
+svg3.addEventListener('pointercancel', () => { s3.drag = null; });
+function palette3() {
+  const box = $('#palette3');
+  Object.keys(COV).forEach(sym => {
+    const b = document.createElement('button');
+    b.type = 'button'; b.textContent = sym; b.style.background = COV[sym].col; b.style.color = COV[sym].ink;
+    b.setAttribute('aria-label', 'Añadir ' + lname(sym));
+    b.addEventListener('click', () => addAtom3(sym));
+    box.appendChild(b);
+  });
+}
+$('#del3').addEventListener('click', () => {
+  if (s3.sel === null) { setMsg('msg3', 'Toca primero el átomo que quieres quitar.', 'warn'); return; }
+  const id = s3.sel;
+  s3.atoms = s3.atoms.filter(a => a.id !== id);
+  s3.bonds = s3.bonds.filter(b => b.a !== id && b.b !== id);
+  s3.sel = null; setMsg('msg3', 'Átomo quitado.'); render3();
+});
+$('#dots3').addEventListener('change', e => { s3.dots = e.target.checked; render3(); });
+$('#reset3').addEventListener('click', () => { clear3(); setMsg('msg3', 'Mesa vacía. Añade átomos con los botones de la derecha.'); });
+
+/* =====================================================================
+   5. ENLACE METÁLICO
+   ===================================================================== */
+const metal = (() => {
+  const cv = $('#cv4'), ctx = cv.getContext('2d');
+  const W = 600, H = 370, COLS = 8, ROWS = 5, SP = 62, X0 = 82, Y0 = 62;
+  const st = { mode: 'metal', sym: 'Na', val: 1, el: [], pila: false, paused: false, shift: 0, lift: 0, anim: null, crossings: [], raf: 0, last: 0, running: false, hitDone: false };
+  const VAL = { Na: 1, Mg: 2, Al: 3 }, NAMES = { Na: 'sodio', Mg: 'magnesio', Al: 'aluminio' };
+  function initE() {
+    st.el = [];
+    if (st.mode !== 'metal') return;
+    const n = COLS * ROWS * st.val;
+    for (let i = 0; i < n; i++) { const a = Math.random() * Math.PI * 2, v = 40 + Math.random() * 50; st.el.push({ x: 40 + Math.random() * 520, y: 36 + Math.random() * 300, vx: Math.cos(a) * v, vy: Math.sin(a) * v }); }
+  }
+  function info() {
+    const box = $('#info4');
+    if (st.mode === 'metal') box.innerHTML = `Cada átomo de ${NAMES[st.sym]} aporta <b>${st.val}</b> electrón${st.val > 1 ? 'es' : ''} y queda como ion <b>${st.sym}${sup(st.val)}</b>. Hay ${COLS * ROWS} iones y ${COLS * ROWS * st.val} electrones libres.`;
+    else box.innerHTML = 'En el cristal de cloruro de sodio cada ion Na⁺ está rodeado de iones Cl⁻ y al revés. No hay electrones libres.';
+  }
+  function resize() {
+    const dpr = Math.min(2, window.devicePixelRatio || 1), w = cv.clientWidth || W;
+    cv.width = Math.round(w * dpr); cv.height = Math.round(w * H / W * dpr);
+    ctx.setTransform(cv.width / W, 0, 0, cv.height / H, 0, 0);
+    draw();
+  }
+  function ionPos(r, c) { return [X0 + c * SP + (r < 2 ? st.shift : 0), Y0 + r * SP - (r < 2 ? st.lift : 0)]; }
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+    ctx.fillStyle = '#FFFFFF'; ctx.fillRect(0, 0, W, H);
+    if (st.mode === 'metal') {
+      ctx.fillStyle = '#E8F0FD'; ctx.beginPath(); ctx.roundRect ? ctx.roundRect(28, 22, 544, 326, 18) : ctx.rect(28, 22, 544, 326); ctx.fill();
+      for (let r = 0; r < ROWS; r++) for (let c = 0; c < COLS; c++) {
+        const [x, y] = ionPos(r, c);
+        const g = ctx.createRadialGradient(x - 6, y - 6, 3, x, y, 21);
+        g.addColorStop(0, '#E4EAF3'); g.addColorStop(1, '#93A3BA');
+        ctx.fillStyle = g; ctx.beginPath(); ctx.arc(x, y, 21, 0, Math.PI * 2); ctx.fill();
+        ctx.strokeStyle = '#6D7C92'; ctx.lineWidth = 1.5; ctx.stroke();
+        ctx.fillStyle = '#1C2333'; ctx.font = '700 13px "Atkinson Hyperlegible", sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.fillText(st.sym + sup(st.val), x, y + 1);
+      }
+      ctx.fillStyle = '#2F6FE0';
+      st.el.forEach(e => { ctx.beginPath(); ctx.arc(e.x, e.y, 3.6, 0, Math.PI * 2); ctx.fill(); });
+    } else {
+      for (let r = 0; r < ROWS; r++) for (let c = 0; c < COLS; c++) {
+        const [x, y] = ionPos(r, c), pos = (r + c) % 2 === 0;
+        ctx.beginPath(); ctx.arc(x, y, pos ? 15 : 23, 0, Math.PI * 2);
+        ctx.fillStyle = pos ? '#AEBBCD' : '#8ED6A6'; ctx.fill();
+        ctx.strokeStyle = pos ? '#6D7C92' : '#4E9C6B'; ctx.lineWidth = 1.5; ctx.stroke();
+        ctx.fillStyle = '#1C2333'; ctx.font = '700 14px "Atkinson Hyperlegible", sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.fillText(pos ? 'Na⁺' : 'Cl⁻', x, y + 1);
+      }
+      if (st.shift >= SP - 1) {
+        // iones de igual carga enfrentados entre la fila 2 y la 3
+        ctx.strokeStyle = '#C23B2A'; ctx.lineWidth = 3;
+        for (let c = 0; c < COLS; c++) {
+          const x = X0 + c * SP, y1 = Y0 + SP - st.lift + 24, y2 = Y0 + 2 * SP - 24;
+          ctx.beginPath(); ctx.moveTo(x - 7, y1 + 4); ctx.lineTo(x, y1 - 3); ctx.lineTo(x + 7, y1 + 4); ctx.stroke();
+          ctx.beginPath(); ctx.moveTo(x - 7, y2 - 4); ctx.lineTo(x, y2 + 3); ctx.lineTo(x + 7, y2 - 4); ctx.stroke();
+        }
+      }
+    }
+    if (st.mode === 'metal' && !st.pila) {
+      ctx.fillStyle = '#1B4BB0'; ctx.font = '700 13px "Atkinson Hyperlegible", sans-serif'; ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
+      ctx.fillText('● electrones libres     ⬤ iones positivos', 40, 364);
+    }
+    if (st.pila) {
+      ctx.fillStyle = '#F0821A'; ctx.font = '700 15px "Atkinson Hyperlegible", sans-serif'; ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
+      ctx.fillText('−  pila conectada  +', 230, 364);
+      ctx.strokeStyle = '#F0821A'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(380, 359); ctx.lineTo(560, 359); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(552, 354); ctx.lineTo(560, 359); ctx.lineTo(552, 364); ctx.stroke();
+    }
+  }
+  function step(dt) {
+    if (st.mode === 'metal') {
+      st.el.forEach(e => {
+        e.vx += (Math.random() - 0.5) * 220 * dt; e.vy += (Math.random() - 0.5) * 220 * dt;
+        const sp = Math.hypot(e.vx, e.vy), max = 95; if (sp > max) { e.vx *= max / sp; e.vy *= max / sp; }
+        e.x += (e.vx + (st.pila ? 85 : 0)) * dt; e.y += e.vy * dt;
+        if (e.y < 32) { e.y = 32; e.vy = Math.abs(e.vy); } if (e.y > 338) { e.y = 338; e.vy = -Math.abs(e.vy); }
+        if (st.pila) { if (e.x > 566) { e.x = 34; st.crossings.push(performance.now()); } if (e.x < 34) e.x = 566; }
+        else { if (e.x < 34) { e.x = 34; e.vx = Math.abs(e.vx); } if (e.x > 566) { e.x = 566; e.vx = -Math.abs(e.vx); } }
+      });
+    }
+    if (st.anim) {
+      const a = st.anim, k = Math.min(1, (performance.now() - a.t0) / a.dur), e = 1 - Math.pow(1 - k, 3);
+      st[a.prop] = a.from + (a.to - a.from) * e;
+      if (k >= 1) { st.anim = null; if (a.done) a.done(); }
+    }
+    const now = performance.now();
+    st.crossings = st.crossings.filter(t => now - t < 1000);
+    $('#cur4').textContent = st.crossings.length;
+    const on = st.crossings.length > 0;
+    $('#glow4').setAttribute('opacity', on ? Math.min(0.9, 0.25 + st.crossings.length / 60) : 0);
+    $('#bulb4').setAttribute('fill', on ? '#FFE27A' : '#E6EAF0');
+  }
+  function loop(t) {
+    if (!st.running) return;
+    const dt = Math.min(0.05, (t - (st.last || t)) / 1000); st.last = t;
+    if (!st.paused) step(dt);
+    draw();
+    st.raf = requestAnimationFrame(loop);
+  }
+  function animate(prop, to, dur, done) { st.anim = { prop, from: st[prop], to, dur: RM ? 1 : dur, t0: performance.now(), done }; if (st.paused || !st.running) { st[prop] = to; st.anim = null; if (done) done(); draw(); } }
+  function hit() {
+    if (st.shift > 0) { setMsg('msg4', 'Ya lo has golpeado. Pulsa el botón naranja para volver a empezar.'); return; }
+    if (st.mode === 'metal') {
+      animate('shift', SP, 700, () => {
+        st.hitDone = true;
+        setMsg('msg4', 'Las capas de iones se han deslizado, pero el mar de electrones las sigue uniendo: el metal se deforma sin romperse. Por eso los metales son dúctiles y maleables.', 'ok');
+        celebrate('¡Se deforma sin romperse!');
+        guideUpdate('metalico');
+      });
+      setMsg('msg4', 'Las capas se desplazan…');
+    } else {
+      animate('shift', SP, 700, () => {
+        st.hitDone = true;
+        setMsg('msg4', 'Al desplazarse una capa, quedan enfrentados iones de la misma carga. Se repelen y el cristal se rompe: los compuestos iónicos son duros pero frágiles.', 'warn');
+        animate('lift', 38, 600);
+        guideUpdate('metalico');
+      });
+      setMsg('msg4', 'Las capas se desplazan…');
+    }
+  }
+  function reset() { st.shift = 0; st.lift = 0; st.anim = null; st.crossings = []; st.pila = false; st.hitDone = false; $('#pila4').checked = false; initE(); info(); draw(); setMsg('msg4', st.mode === 'metal' ? 'Observa cómo se mueven los electrones. Después conecta la pila o golpea el metal.' : 'Cristal iónico de cloruro de sodio. Prueba a conectar la pila o a golpearlo.'); guideUpdate('metalico'); }
+  function setMode(mode) {
+    st.mode = mode;
+    $$('#mode4 [data-mode]').forEach(x => x.setAttribute('aria-pressed', x.dataset.mode === mode ? 'true' : 'false'));
+    $('#metal4').hidden = st.mode !== 'metal';
+    reset();
+  }
+  $('#mode4').addEventListener('click', e => { const b = e.target.closest('[data-mode]'); if (b) setMode(b.dataset.mode); });
+  $('#metal4').addEventListener('click', e => {
+    const b = e.target.closest('[data-sym]'); if (!b) return;
+    st.sym = b.dataset.sym; st.val = VAL[st.sym];
+    $$('#metal4 [data-sym]').forEach(x => x.setAttribute('aria-pressed', x === b ? 'true' : 'false'));
+    reset();
+  });
+  $('#pila4').addEventListener('change', e => {
+    st.pila = e.target.checked;
+    if (st.pila && st.mode === 'metal') celebrate('¡Hay corriente!');
+    if (st.mode === 'metal') setMsg('msg4', st.pila ? 'Los electrones libres avanzan hacia el polo positivo de la pila: hay corriente eléctrica. Por eso los metales conducen.' : 'Pila desconectada: los electrones se mueven al azar y no hay corriente.', st.pila ? 'ok' : '');
+    else setMsg('msg4', st.pila ? 'No pasa corriente: en el cristal sólido no hay electrones libres y los iones no pueden moverse. (Fundido o disuelto en agua sí conduciría.)' : 'Pila desconectada.', st.pila ? 'warn' : '');
+    draw();
+    guideUpdate('metalico');
+  });
+  $('#hit4').addEventListener('click', hit);
+  $('#pause4').addEventListener('click', e => { st.paused = !st.paused; e.currentTarget.setAttribute('aria-pressed', st.paused ? 'true' : 'false'); e.currentTarget.textContent = st.paused ? 'Continuar' : 'Pausar'; });
+  $('#reset4').addEventListener('click', reset);
+  window.addEventListener('resize', () => { if (st.running) resize(); });
+  initE(); info();
+  return {
+    st, setMode,
+    start() { if (st.running) return; st.running = true; st.last = 0; if (RM && !st.paused) { st.paused = true; const b = $('#pause4'); b.setAttribute('aria-pressed', 'true'); b.textContent = 'Continuar'; } resize(); st.raf = requestAnimationFrame(loop); },
+    stop() { st.running = false; cancelAnimationFrame(st.raf); }
+  };
+})();
+
+/* =====================================================================
+   6. RETO
+   ===================================================================== */
+const game = (() => {
+  const L3 = [
+    ['KCl', 'cloruro de potasio', 'Iónico'], ['CaO', 'óxido de calcio', 'Iónico'], ['Li₂O', 'óxido de litio', 'Iónico'], ['Na₂S', 'sulfuro de sodio', 'Iónico'], ['CaCl₂', 'cloruro de calcio', 'Iónico'],
+    ['HCl', 'cloruro de hidrógeno', 'Covalente'], ['H₂S', 'sulfuro de hidrógeno', 'Covalente'], ['N₂', 'nitrógeno', 'Covalente'], ['CCl₄', 'tetracloruro de carbono', 'Covalente'], ['F₂', 'flúor', 'Covalente'], ['C₂H₆', 'etano', 'Covalente'],
+    ['Cu', 'cobre', 'Metálico'], ['Fe', 'hierro', 'Metálico'], ['Zn', 'cinc', 'Metálico'], ['Au', 'oro', 'Metálico'], ['Ag', 'plata', 'Metálico']
+  ];
+  const WHY = {
+    'Iónico': 'Está formado por un metal y un no metal: el metal cede electrones al no metal y los iones de carga opuesta se atraen.',
+    'Covalente': 'Solo hay no metales: sus átomos comparten pares de electrones para completar la última capa.',
+    'Metálico': 'Es un metal puro: sus átomos ceden los electrones de valencia a un mar de electrones que une a todos los iones positivos.'
+  };
+  function mkCfg() {
+    return shuffle([3, 5, 6, 7, 8, 9, 11, 12, 13, 14, 15, 16, 17, 19, 20]).slice(0, 6).map(z => {
+      const s = SYMZ[z - 1], ans = cfgStr(z), f = fill(z), li = ORDER.findIndex((o, i) => f[i] > 0 && (i === ORDER.length - 1 || f[i + 1] === 0));
+      const opts = [ans, cfgStr(z + 1), cfgStr(z - 1)];
+      // error típico: saltarse un subnivel (los electrones del último pasan al siguiente)
+      const skip = f.slice(); skip[li + 1] = skip[li]; skip[li] = 0;
+      if (ORDER[li + 1] && f[li] <= ORDER[li + 1].cap) opts.push(strFromCounts(skip));
+      if (opts.length < 4 || new Set(opts).size < 4) { const over = f.slice(); const pi = ORDER.findIndex(o => o.t === 'p' && f[ORDER.indexOf(o)] === 6); if (pi >= 0 && f[pi + 1] > 0) { over[pi] = 8; over[pi + 1] -= 2; if (over[pi + 1] >= 0) opts.push(strFromCounts(over)); } }
+      const uniq = [...new Set(opts)].slice(0, 4);
+      return {
+        prompt: `¿Cuál es la configuración electrónica del ${lname(s)}?`, big: `${s} · Z = ${z}`, long: true, options: shuffle(uniq), answer: ans,
+        why: `El ${lname(s)} tiene ${z} electrones. Se colocan por orden de energía (1s 2s 2p 3s 3p 4s…) sin pasar de 2 en un subnivel s ni de 6 en uno p: ${ans}. Comprueba que los superíndices suman ${z}.`
+      };
+    });
+  }
+  function mkEnlace() {
+    return shuffle(L3).slice(0, 6).map(([f, n, ans]) => ({ prompt: `¿Qué tipo de enlace tiene el ${n}?`, big: f, options: ['Iónico', 'Covalente', 'Metálico'], answer: ans, why: WHY[ans] }));
+  }
+  function mkIon() {
+    const list = ['Li', 'K', 'Ca', 'Be', 'F', 'P', 'Ar'];
+    return shuffle(list).slice(0, 6).map(s => {
+      const z = EL[s][0], v = valence(z), sh = shells(z).join(', ');
+      if (EL[s][3] === 'ng') return { prompt: `¿Qué ion forma el ${lname(s)}?`, big: `${s} (${sh})`, options: shuffle([s + '⁺', s + '⁻', s + '²⁺', 'No forma iones']), answer: 'No forma iones', why: `El ${lname(s)} es un gas noble: su última capa ya está completa, así que no gana ni pierde electrones.` };
+      let ans, opts, why;
+      if (v <= 3) {
+        ans = s + sup(v);
+        opts = [ans, s + sup(-v), s + sup(-(8 - v)), s + sup(v === 1 ? 2 : v - 1)];
+        why = `El ${lname(s)} tiene ${sh}: le resulta más fácil perder ${v} electrón${v > 1 ? 'es' : ''} y quedarse como el ${NOBLE[z - v]}. Forma el catión ${ans}.`;
+      } else {
+        const g = 8 - v; ans = s + sup(-g);
+        opts = [ans, s + sup(g), s + sup(v), s + sup(-v)];
+        why = `El ${lname(s)} tiene ${sh}: le resulta más fácil ganar ${g} electrón${g > 1 ? 'es' : ''} y quedarse como el ${NOBLE[z + g]}. Forma el anión ${ans}.`;
+      }
+      return { prompt: `¿Qué ion forma el ${lname(s)}?`, big: `${s} (${sh})`, options: shuffle([...new Set(opts)]), answer: ans, why };
+    });
+  }
+  function mkFormula() {
+    const pairs = [['K', 'F'], ['Ca', 'Cl'], ['Li', 'O'], ['Ca', 'O'], ['Na', 'S'], ['K', 'S'], ['Li', 'N'], ['Ca', 'N'], ['Al', 'S']];
+    return shuffle(pairs).slice(0, 6).map(([m, x]) => {
+      const qm = valence(EL[m][0]), qx = 8 - valence(EL[x][0]), l = qm * qx / gcd(qm, qx), a = l / qm, b = l / qx;
+      const ans = m + sub(a) + x + sub(b);
+      const ratios = [[1, 1], [1, 2], [2, 1], [1, 3], [3, 1], [2, 3], [3, 2]].filter(([p, q]) => !(p === a && q === b));
+      const opts = [ans, m + sub(b) + x + sub(a)];
+      shuffle(ratios).forEach(([p, q]) => { const f = m + sub(p) + x + sub(q); if (opts.length < 4 && !opts.includes(f)) opts.push(f); });
+      const name = `${AN_NAME[x]} de ${MET_NAME[m]}`;
+      return {
+        prompt: `¿Qué fórmula tiene el ${name}?`, big: `${m}${sup(qm)}  y  ${x}${sup(-qx)}`, options: shuffle(opts), answer: ans,
+        why: `Cada ${MET_NAME[m]} pierde ${qm} electrón${qm > 1 ? 'es' : ''} y cada átomo de ${lname(x)} gana ${qx}. Para que las cargas se compensen hacen falta ${a} de ${m} por cada ${b} de ${x}: ${ans}.`
+      };
+    });
+  }
+  const LEVELS = [
+    { title: 'Nivel 1 · ¿Qué configuración tiene?', desc: 'Elige la configuración electrónica correcta de un elemento.', make: mkCfg },
+    { title: 'Nivel 2 · ¿Qué ion forma?', desc: 'Decide si cada elemento gana o pierde electrones, y cuántos.', make: mkIon },
+    { title: 'Nivel 3 · ¿Qué enlace es?', desc: 'Clasifica sustancias en iónicas, covalentes o metálicas.', make: mkEnlace },
+    { title: 'Nivel 4 · ¿Qué fórmula tiene?', desc: 'Combina iones para que las cargas se compensen.', make: mkFormula }
+  ];
+  const KEY = 'taller-enlaces-best-v2';
+  const best = LEVELS.map(() => 0);
+  try { const b = JSON.parse(localStorage.getItem(KEY) || '[]'); b.forEach((v, i) => { if (typeof v === 'number' && i < best.length) best[i] = v; }); } catch (e) { /* sin almacenamiento */ }
+  const starsOf = pts => pts >= 11 ? 3 : pts >= 8 ? 2 : pts >= 5 ? 1 : 0;
+  const starHtml = n => '<span class="stars" aria-label="' + n + ' estrellas">' + [0, 1, 2].map(i => i < n ? '★' : '<span class="off">★</span>').join('') + '</span>';
+  let g = null;
+  function showLevels() {
+    $('#play5').hidden = true; const box = $('#levels5'); box.hidden = false;
+    box.innerHTML = LEVELS.map((L, i) => `<button class="level" type="button" data-level="${i}"><b>${L.title}</b><span>${L.desc}</span>${starHtml(starsOf(best[i]))}</button>`).join('');
+  }
+  function start(i) {
+    g = { level: i, qs: LEVELS[i].make(), idx: 0, pts: 0, tries: 0, res: [] };
+    $('#levels5').hidden = true; $('#play5').hidden = false; renderQ();
+  }
+  function renderQ() {
+    const q = g.qs[g.idx];
+    const dots = g.qs.map((_, i) => `<i class="${g.res[i] === 2 ? 'ok' : g.res[i] === 1 ? 'half' : g.res[i] === 0 ? 'ko' : ''}${i === g.idx ? ' now' : ''}"></i>`).join('');
+    $('#play5').innerHTML = `<div class="qcard"><div class="qtop"><span>${LEVELS[g.level].title}</span><span>Pregunta ${g.idx + 1} de ${g.qs.length} · ${g.pts} puntos</span></div>
+      <div class="dots" aria-hidden="true">${dots}</div>
+      <p class="qprompt">${q.prompt}</p><div class="qbig">${q.big}</div>
+      <div class="qopts${q.long ? ' long' : ''}">${q.options.map(o => `<button class="btn" type="button" data-opt="${o}">${o}</button>`).join('')}</div>
+      <div id="fb5" aria-live="polite"></div>
+      <div class="row"><button class="btn" type="button" id="quit5">Volver a los niveles</button></div></div>`;
+  }
+  function answer(btn) {
+    const q = g.qs[g.idx], opt = btn.dataset.opt;
+    if (btn.classList.contains('wrong') || btn.disabled) return;
+    const fb = $('#fb5');
+    if (opt === q.answer) {
+      const p = g.tries === 0 ? 2 : 1; g.pts += p; g.res[g.idx] = p;
+      btn.classList.add('right'); $$('#play5 [data-opt]').forEach(b => b.disabled = true);
+      celebrate('¡Correcto!');
+      fb.innerHTML = `<div class="qfeedback status ok">¡Correcto! +${p} punto${p > 1 ? 's' : ''}. ${q.why}</div><div class="row" style="margin-top:8px"><button class="btn primary" type="button" id="next5">${g.idx + 1 < g.qs.length ? 'Siguiente' : 'Ver resultado'}</button></div>`;
+    } else if (g.tries === 0) {
+      g.tries = 1; btn.classList.add('wrong');
+      fb.innerHTML = '<div class="qfeedback status warn">No es esa. Piénsalo otra vez: tienes un segundo intento.</div>';
+    } else {
+      g.res[g.idx] = 0; btn.classList.add('wrong');
+      $$('#play5 [data-opt]').forEach(b => { b.disabled = true; if (b.dataset.opt === q.answer) b.classList.add('right'); });
+      fb.innerHTML = `<div class="qfeedback status neutral">La respuesta era <b>${q.answer}</b>. ${q.why}</div><div class="row" style="margin-top:8px"><button class="btn primary" type="button" id="next5">${g.idx + 1 < g.qs.length ? 'Siguiente' : 'Ver resultado'}</button></div>`;
+    }
+  }
+  function next() {
+    g.idx++; g.tries = 0;
+    if (g.idx < g.qs.length) { renderQ(); return; }
+    if (g.pts > best[g.level]) { best[g.level] = g.pts; try { localStorage.setItem(KEY, JSON.stringify(best)); } catch (e) { /* sin almacenamiento */ } }
+    const s = starsOf(g.pts);
+    $('#play5').innerHTML = `<div class="qcard"><p class="qprompt">${LEVELS[g.level].title}</p><div class="qbig">${starHtml(s)}<br>${g.pts} de 12 puntos</div>
+      <p>${s === 3 ? '¡Excelente! Dominas este nivel.' : s === 2 ? 'Muy bien. Repasa las preguntas que fallaste y vuelve a intentarlo.' : 'Vuelve a las simulaciones y repasa este tema antes de repetir el nivel.'}</p>
+      <div class="row"><button class="btn primary" type="button" id="again5">Repetir el nivel</button><button class="btn" type="button" id="quit5">Volver a los niveles</button></div></div>`;
+  }
+  $('#v-reto').addEventListener('click', e => {
+    const lv = e.target.closest('[data-level]'); if (lv) { start(+lv.dataset.level); return; }
+    const op = e.target.closest('[data-opt]'); if (op) { answer(op); return; }
+    if (e.target.closest('#next5')) { next(); return; }
+    if (e.target.closest('#again5')) { start(g.level); return; }
+    if (e.target.closest('#quit5')) showLevels();
+  });
+  return { showLevels };
+})();
+
+/* =====================================================================
+   GUÍAS DE CADA PANTALLA
+   ===================================================================== */
+const go = (id, txt) => `<button class="linkbtn" type="button" data-go="${id}">${txt}</button>`;
+
+G.configuracion = makeGuide('configuracion', [
+  { enter() { set0(0); }, do: 'Toca el subnivel <b>1s</b>, el más bajo del diagrama, para colocar el primer electrón.', check: () => s0.e >= 1,
+    hint: 'Busca la fila con la etiqueta 1s, abajo del todo, y tócala una vez.',
+    title: 'El primer electrón: hidrógeno', learn: 'Los electrones se colocan primero en el subnivel de <b>menor energía</b>, el 1s. Con 1 electrón tienes el hidrógeno: <b>1s¹</b>. El 1 es la capa, la s el tipo de subnivel y el número pequeño de arriba, los electrones que hay en él.' },
+  { do: 'Añade un segundo electrón. Puedes tocar otra vez el 1s o pulsar «+ Añadir electrón».', check: () => s0.e >= 2,
+    hint: 'Toca de nuevo la fila 1s.',
+    title: 'Dos electrones por caja', learn: 'En cada caja (orbital) caben <b>2 electrones como máximo</b>, que se dibujan con flechas opuestas (↑↓). El subnivel s tiene una sola caja, así que le caben 2. El helio, <b>1s²</b>, ya tiene la capa 1 completa.' },
+  { do: 'Sigue añadiendo electrones hasta llegar al <b>neón</b> (10 electrones). Fíjate en qué subnivel va cada uno.', check: () => s0.e >= 10,
+    hint: 'El triángulo naranja marca siempre dónde va el siguiente electrón: primero el 2s y después el 2p.',
+    title: 'El subnivel p', learn: 'Después del 1s se llenan el 2s (2 electrones) y el 2p, que tiene 3 cajas: le caben <b>6</b>. La capa 2 tiene 2 + 6 = <b>8</b> electrones. Neón: <b>1s² 2s² 2p⁶</b>. Su última capa está llena: es un gas noble.' },
+  { do: 'Llega al argón (18 electrones) y añade uno más. ¿Dónde se coloca el electrón número 19: en el 3d o en el 4s?', check: () => s0.e >= 19,
+    hint: 'Mira la altura de las filas: el 4s está más abajo que el 3d, así que tiene menos energía.',
+    title: 'El 4s se llena antes que el 3d', learn: 'El 4s tiene <b>menos energía</b> que el 3d, así que se llena antes. Por eso el potasio es <b>1s² 2s² 2p⁶ 3s² 3p⁶ 4s¹</b>. El orden de llenado se recuerda con el <b>diagrama de Moeller</b>: sigue las flechas naranjas en el orden de sus números.' },
+  { enter() { set0(14); }, q: { opts: ['4', '2', '14', '8'], ans: 0, hint: 'La última capa es la de número más alto (la 3). Suma los electrones de los subniveles que empiezan por 3.' },
+    do: 'Ahora tienes el <b>silicio</b> (Z = 14). ¿Cuántos electrones tiene en su última capa?',
+    title: 'Electrones de valencia', learn: `La última capa del silicio es la 3: 3s² 3p², es decir, <b>4 electrones de valencia</b>. Los electrones de la última capa son los que deciden cómo se une un átomo a otros. Lo verás en la pantalla ${go('octeto', 'Octeto')}.` },
+  { enter() { set0(20); }, q: { opts: ['4s', '3d', '3p', '4p'], ans: 0, hint: 'Mira el último término de la configuración, el de la derecha.' },
+    do: 'Ahora tienes el <b>calcio</b> (Z = 20). ¿En qué subnivel está su último electrón?',
+    title: 'El calcio acaba en 4s²', learn: 'Calcio: <b>1s² 2s² 2p⁶ 3s² 3p⁶ 4s²</b>. Tiene 2 electrones de valencia (capa 4) y tiende a perderlos para formar <b>Ca²⁺</b>. El último subnivel indica el bloque de la tabla: los colores de la tabla de abajo lo muestran.' }
+], [
+  'Los electrones ocupan los subniveles de menor a mayor energía: 1s 2s 2p 3s 3p 4s 3d 4p…',
+  'En un subnivel s caben 2 electrones; en uno p, 6; en uno d, 10.',
+  'Se escribe la capa, el tipo de subnivel y los electrones como superíndice: 3p⁵.',
+  'Los electrones de la última capa son los de valencia: deciden cómo se une el átomo a otros.'
+]);
+
+G.octeto = makeGuide('octeto', [
+  { enter() { select1('Li'); }, q: { opts: ['1', '2', '3', '0'], ans: 0, hint: 'Cuenta solo los electrones de la capa de fuera, la más grande (la azul).' },
+    do: 'Este es el <b>litio</b>: sus 3 electrones se reparten en capas (2, 1). ¿Cuántos electrones hay en su última capa?',
+    title: 'Electrones de valencia', learn: 'Los electrones de la última capa se llaman <b>electrones de valencia</b>. Son los que intervienen en los enlaces. El litio tiene 1.' },
+  { enter() { if (s1.sym !== 'Li') select1('Li'); }, do: 'Arrastra ese electrón fuera del átomo, hasta el recipiente (o pulsa «− Quitar electrón»).', check: () => s1.sym === 'Li' && s1.e === 2,
+    hint: 'Pulsa sobre el electrón de la capa de fuera y suéltalo lejos del átomo.',
+    title: 'Un ion positivo: catión', learn: 'Ahora hay 3 protones (+) y 2 electrones (−): sobra una carga positiva. Es un <b>ion positivo o catión</b>, Li⁺. Le queda una sola capa con <b>2 electrones</b>, igual que el helio, un gas noble.' },
+  { enter() { select1('F'); }, do: 'Ahora tienes el <b>flúor</b> (7 electrones de valencia). Consigue que su última capa quede como la del neón.', check: () => s1.sym === 'F' && s1.e === 10,
+    hint: 'Al flúor le falta 1 electrón para tener 8. Arrastra uno desde el recipiente hasta el átomo.',
+    title: 'Un ion negativo: anión', learn: 'Al flúor le faltaba 1 electrón para tener 8. Al ganarlo tiene 9 protones y 10 electrones: sobra una carga negativa. Es un <b>ion negativo o anión</b>, F⁻.' },
+  { enter() { select1('Ne'); }, q: { opts: ['Su última capa ya tiene 8 electrones', 'No tienen electrones', 'Tienen más protones que electrones'], ans: 0, hint: 'Fíjate en cuántos electrones hay en la última capa del neón.' },
+    do: 'Este es el <b>neón</b>, un gas noble. ¿Por qué los gases nobles casi no forman compuestos?',
+    title: 'La regla del octeto', learn: 'Los átomos tienden a ganar, perder o compartir electrones hasta tener <b>8 en su última capa</b> (2 si solo tienen una capa, como el helio). Así quedan como un gas noble, que es muy estable.' },
+  { enter() { select1('C'); }, q: { opts: ['Le cuesta lo mismo ganar 4 que perder 4, así que comparte electrones', 'Pierde 4 y forma C⁴⁺', 'No hace nada: ya es estable'], ans: 0, hint: '¿Cuántos electrones le faltan para tener 8? ¿Cuántos tendría que perder para quedarse como el helio?' },
+    do: 'El <b>carbono</b> tiene 4 electrones de valencia. ¿Qué crees que hará? Puedes probarlo en el átomo.',
+    title: 'Metales y no metales', learn: `Al carbono le cuesta lo mismo ganar 4 que perder 4, así que no forma iones: <b>comparte</b> electrones (${go('covalente', 'enlace covalente')}). En general, los <b>metales</b> (1, 2 o 3 electrones de valencia) los pierden y forman cationes, y los <b>no metales</b> (5, 6 o 7) los ganan y forman aniones. Cuando se juntan, aparece el ${go('ionico', 'enlace iónico')}.` }
+], [
+  'Los electrones de la última capa son los electrones de valencia.',
+  'Un átomo que pierde electrones queda con carga positiva (catión); uno que los gana, con carga negativa (anión).',
+  'Regla del octeto: los átomos tienden a quedarse con 8 electrones en la última capa (2 si solo tienen una), como un gas noble.',
+  'Los metales tienden a perder electrones y los no metales, a ganarlos. Si les cuesta lo mismo, comparten.'
+]);
+
+G.ionico = makeGuide('ionico', [
+  { enter() { setIonic('K', 'F', 1, 1); }, q: { opts: ['El potasio le da un electrón al flúor', 'El flúor le da un electrón al potasio'], ans: 0, hint: 'Al potasio le sobra 1 electrón para quedarse como un gas noble. ¿Y al flúor?' },
+    do: 'Aquí tienes un átomo de <b>potasio</b> (metal, 1 electrón de valencia) y uno de <b>flúor</b> (no metal, 7). ¿Quién debería dar un electrón a quién?',
+    title: 'El metal cede, el no metal gana', learn: 'Al potasio le cuesta poco perder su único electrón de valencia, y al flúor le falta justo uno para tener 8. El electrón pasa <b>del metal al no metal</b>.' },
+  { enter() { if (!(s2.done && s2.metal === 'K' && s2.nonmetal === 'F')) setIonic('K', 'F', 1, 1); }, do: 'Arrastra el electrón del potasio hasta el flúor.', check: () => s2.done && s2.metal === 'K' && s2.nonmetal === 'F',
+    hint: 'Pulsa sobre el punto azul del potasio y suéltalo encima del flúor. También puedes tocar el potasio y después el flúor.',
+    title: 'El enlace iónico', learn: 'El potasio queda como <b>K⁺</b> y el flúor como <b>F⁻</b>. Los iones de carga opuesta se atraen con fuerza: eso es el <b>enlace iónico</b>. La fórmula es KF: un ion de cada.' },
+  { enter() { setIonic('Li', 'O', 1, 1); }, do: 'Ahora <b>litio</b> (1 electrón de valencia) y <b>oxígeno</b> (6). Pasa los electrones hasta que todos tengan la capa completa. Si hace falta, añade átomos.', check: () => s2.done && s2.metal === 'Li' && s2.nonmetal === 'O',
+    hint: 'Al oxígeno le faltan 2 electrones, pero cada litio solo tiene 1 que dar. Pulsa «+» en «Metal» para añadir otro litio.',
+    title: 'Las cargas se compensan', learn: 'El oxígeno necesita 2 electrones, pero cada litio solo da 1: hacen falta <b>dos litios</b>. Se forman 2 Li⁺ y O²⁻, y las cargas se compensan (2 × +1 y −2). Fórmula: <b>Li₂O</b>.' },
+  { enter() { setIonic('Al', 'O', 1, 1); }, do: 'Reto: forma el <b>óxido de aluminio</b>. El aluminio pierde 3 electrones y el oxígeno gana 2. ¿Cuántos átomos de cada uno necesitas?', check: () => s2.done && s2.metal === 'Al' && s2.nonmetal === 'O',
+    hint: 'Busca un número de electrones que puedan dar los aluminios y recibir los oxígenos: 6 sirve (2 × 3 = 3 × 2).',
+    title: 'Mínimo común múltiplo', learn: 'Con 2 aluminios se ceden 6 electrones, justo los que aceptan 3 oxígenos. Se forman 2 Al³⁺ y 3 O²⁻: <b>Al₂O₃</b>. Los subíndices indican cuántos iones de cada tipo hacen falta para que el compuesto sea neutro.' }
+], [
+  'En el enlace iónico, el metal cede electrones al no metal.',
+  'Se forman iones de carga opuesta (cationes y aniones) que se atraen.',
+  'La fórmula indica en qué proporción se combinan los iones para que las cargas se compensen.',
+  'En un sólido iónico hay millones de iones ordenados en una red cristalina.'
+]);
+
+G.covalente = makeGuide('covalente', [
+  { enter() { clear3(); setMsg('msg3', 'Mesa vacía. Añade dos átomos de hidrógeno y únelos.'); }, do: 'Pulsa dos veces el botón <b>H</b> para añadir dos hidrógenos. Después toca uno y luego el otro para unirlos.', check: () => s3.built.has(keyOf({ H: 2 })),
+    hint: 'Los botones redondos de «Añadir átomos» ponen átomos en la mesa. Para unir, toca un átomo y luego el otro (sin arrastrar).',
+    title: 'Compartir un par de electrones', learn: 'Cada hidrógeno aporta su único electrón y forman un <b>par compartido</b>. Con él, cada H tiene 2 electrones, como el helio. Es un <b>enlace covalente simple</b>: H–H.' },
+  { enter() { clear3(); setMsg('msg3', 'Mesa vacía. Construye el cloruro de hidrógeno.'); }, do: 'Construye el <b>cloruro de hidrógeno</b> (HCl): un H y un Cl unidos.', check: () => s3.built.has(keyOf({ H: 1, Cl: 1 })),
+    hint: 'Añade un H y un Cl y únelos con un toque en cada uno.',
+    title: 'El cloro completa su octeto', learn: 'El cloro tiene 7 electrones de valencia: le falta 1. Al compartir un par con el hidrógeno, el cloro cuenta <b>8</b> (3 pares propios y 1 compartido) y el hidrógeno, 2.' },
+  { enter() { clear3(); setMsg('msg3', 'Mesa vacía. Construye el sulfuro de hidrógeno.'); }, do: 'Construye el <b>sulfuro de hidrógeno</b> (H₂S). ¿Cuántos enlaces necesita el azufre?', check: () => s3.built.has(keyOf({ H: 2, S: 1 })),
+    hint: 'Añade un S y dos H. Une el S con cada uno de los H.',
+    title: 'Tantos enlaces como electrones le faltan', learn: 'El azufre tiene 6 electrones de valencia: le faltan 2, así que forma <b>2 enlaces</b>, uno con cada hidrógeno. Le quedan <b>2 pares sin compartir</b>.' },
+  { enter() { clear3(); setMsg('msg3', 'Mesa vacía. Construye la molécula de oxígeno.'); }, do: 'Construye el <b>oxígeno</b> (O₂): dos átomos de O. Une los mismos dos átomos más de una vez si hace falta.', check: () => s3.built.has(keyOf({ O: 2 })),
+    hint: 'Une los dos O, y vuelve a tocar uno y después el otro para compartir un segundo par.',
+    title: 'Enlace doble', learn: 'A cada oxígeno le faltan 2 electrones, así que comparten <b>dos pares</b>: es un <b>enlace doble</b> (O=O). El nitrógeno, al que le faltan 3, forma un enlace triple en el N₂.' },
+  { q: { opts: ['Entre no metales', 'Entre un metal y un no metal', 'Entre metales'], ans: 0, hint: 'Fíjate en los elementos de los botones: H, C, N, O, S, F y Cl.' },
+    do: '¿Entre qué tipo de átomos se forma el enlace covalente?',
+    title: 'El enlace covalente', learn: `Se forma entre <b>no metales</b>: todos quieren ganar electrones, así que ninguno los cede y los <b>comparten</b>. Si se juntan un metal y un no metal, el metal los cede: ${go('ionico', 'enlace iónico')}.` }
+], [
+  'En el enlace covalente los átomos comparten pares de electrones; cada átomo aporta uno a cada par.',
+  'Cada átomo forma tantos enlaces como electrones le faltan para tener 8 (2 el hidrógeno).',
+  'Dos átomos pueden compartir uno, dos o tres pares: enlace simple, doble o triple.',
+  'El enlace covalente se da entre no metales.'
+]);
+
+G.metalico = makeGuide('metalico', [
+  { enter() { if (metal.st.mode !== 'metal') metal.setMode('metal'); }, q: { opts: ['Lo suelta y se mueve libre por todo el metal', 'Lo comparte con un solo vecino', 'Se lo da a un no metal'], ans: 0, hint: 'Observa los puntos azules del dibujo: ¿están quietos junto a un átomo?' },
+    do: 'Cada átomo de sodio tiene 1 electrón de valencia. Mira la simulación: ¿qué hace con él?',
+    title: 'El mar de electrones', learn: 'En un metal, cada átomo suelta sus electrones de valencia y queda como <b>ion positivo</b>. Los electrones libres forman un <b>mar de electrones</b> que se mueve entre los iones y los mantiene unidos: es el <b>enlace metálico</b>.' },
+  { enter() { if (metal.st.mode !== 'metal') metal.setMode('metal'); }, do: 'Marca «<b>Conectar a una pila</b>» y observa la bombilla.', check: () => metal.st.mode === 'metal' && metal.st.pila,
+    hint: 'La casilla está en el recuadro «Experimentos».',
+    title: 'Los metales conducen la electricidad', learn: 'Al conectar la pila, los electrones libres avanzan hacia el polo positivo: hay <b>corriente eléctrica</b> y la bombilla se enciende. Por eso los metales son buenos conductores.' },
+  { enter() { if (metal.st.mode !== 'metal') metal.setMode('metal'); }, do: 'Pulsa «<b>Golpear el material</b>». ¿Se rompe el metal?', check: () => metal.st.mode === 'metal' && metal.st.hitDone,
+    hint: 'El botón azul está en «Experimentos». Si ya lo habías golpeado, pulsa antes el botón naranja.',
+    title: 'Se deforman sin romperse', learn: 'Las capas de iones se deslizan, pero el mar de electrones las sigue uniendo. Por eso los metales se pueden estirar en hilos (<b>dúctiles</b>) y en láminas (<b>maleables</b>).' },
+  { do: 'Cambia a «<b>Cristal iónico (NaCl)</b>» y golpéalo también.', check: () => metal.st.mode === 'ionic' && metal.st.hitDone,
+    hint: 'El botón «Cristal iónico (NaCl)» está en el recuadro «Material».',
+    title: 'Los cristales iónicos son frágiles', learn: 'Al desplazarse una capa quedan enfrentados iones de la <b>misma carga</b>, que se repelen, y el cristal se rompe. Además, el cristal sólido no conduce: no tiene electrones libres.' }
+], [
+  'En un metal, los átomos sueltan sus electrones de valencia y quedan como iones positivos.',
+  'Los electrones libres forman un mar de electrones que une a todos los iones: enlace metálico.',
+  'Por eso los metales conducen la electricidad y se deforman sin romperse.',
+  'Los cristales iónicos, en cambio, son frágiles y en estado sólido no conducen.'
+]);
+
+/* ---------- arranque ---------- */
+buildPt0(); render0();
+buildPtable(); render1();
+chips2(); build2();
+palette3(); render3();
+const startView = (location.hash || '').slice(1);
+show(VIEWS.includes(startView) ? startView : 'home');
+})();
+</script>
+
+</body></html>
