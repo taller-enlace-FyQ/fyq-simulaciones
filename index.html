@@ -1733,9 +1733,9 @@ G.ionico = makeGuide('ionico', [
   { enter() { setIonic('Li', 'O', 1, 1); }, do: 'Ahora <b>litio</b> (1 electrón de valencia) y <b>oxígeno</b> (6). Pasa los electrones hasta que todos tengan la capa completa. Si hace falta, añade átomos.', check: () => s2.done && s2.metal === 'Li' && s2.nonmetal === 'O',
     hint: 'Al oxígeno le faltan 2 electrones, pero cada litio solo tiene 1 que dar. Pulsa «+» en «Metal» para añadir otro litio.',
     title: 'Las cargas se compensan', learn: 'El oxígeno necesita 2 electrones, pero cada litio solo da 1: hacen falta <b>dos litios</b>. Se forman 2 Li⁺ y O²⁻, y las cargas se compensan (2 × +1 y −2). Fórmula: <b>Li₂O</b>.' },
-  { enter() { setIonic('Al', 'O', 1, 1); }, do: 'Reto: forma el <b>óxido de aluminio</b>. El aluminio pierde 3 electrones y el oxígeno gana 2. ¿Cuántos átomos de cada uno necesitas?', check: () => s2.done && s2.metal === 'Al' && s2.nonmetal === 'O',
-    hint: 'Busca un número de electrones que puedan dar los aluminios y recibir los oxígenos: 6 sirve (2 × 3 = 3 × 2).',
-    title: 'Mínimo común múltiplo', learn: 'Con 2 aluminios se ceden 6 electrones, justo los que aceptan 3 oxígenos. Se forman 2 Al³⁺ y 3 O²⁻: <b>Al₂O₃</b>. Los subíndices indican cuántos iones de cada tipo hacen falta para que el compuesto sea neutro.' }
+  { enter() { setIonic('Ca', 'F', 1, 1); }, do: 'Reto: ahora al revés. Forma el <b>fluoruro de calcio</b>: el calcio tiene 2 electrones que dar y cada flúor solo acepta 1. ¿Cuántos átomos de cada uno necesitas?', check: () => s2.done && s2.metal === 'Ca' && s2.nonmetal === 'F',
+    hint: 'Un solo flúor no puede recibir los 2 electrones del calcio. Pulsa «+» en «No metal» para añadir otro flúor.',
+    title: 'Los subíndices compensan las cargas', learn: 'Un calcio cede 2 electrones, justo los que aceptan 2 flúor. Se forman Ca²⁺ y 2 F⁻: <b>CaF₂</b>. Los subíndices indican cuántos iones de cada tipo hacen falta para que el compuesto sea neutro.' }
 ], [
   'En el enlace iónico, el metal cede electrones al no metal.',
   'Se forman iones de carga opuesta (cationes y aniones) que se atraen.',
